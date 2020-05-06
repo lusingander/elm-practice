@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Card exposing (Card, allCards, showCard)
 import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
@@ -41,25 +42,6 @@ initCardState c =
 resetCardStates : List CardState -> List CardState
 resetCardStates =
     List.map faceDown
-
-
-allCards : List Card
-allCards =
-    List.range 1 13 |> List.map numberCards |> List.concat
-
-
-numberCards : Int -> List Card
-numberCards =
-    numberToRank >> rankCards
-
-
-rankCards : Rank -> List Card
-rankCards r =
-    [ Card Spades r
-    , Card Hearts r
-    , Card Diamonds r
-    , Card Clubs r
-    ]
 
 
 faceUpCard : CardState -> GameState -> GameState
@@ -103,78 +85,6 @@ type CardState
 type FaceState
     = FaceUp
     | FaceDown
-
-
-type Card
-    = Card Suit Rank
-    | Joker
-    | CardBack
-
-
-type Suit
-    = Spades
-    | Hearts
-    | Diamonds
-    | Clubs
-
-
-type Rank
-    = Ace
-    | Two
-    | Three
-    | Four
-    | Five
-    | Six
-    | Seven
-    | Eight
-    | Nine
-    | Ten
-    | Jack
-    | Queen
-    | King
-
-
-numberToRank : Int -> Rank
-numberToRank n =
-    case n of
-        1 ->
-            Ace
-
-        2 ->
-            Two
-
-        3 ->
-            Three
-
-        4 ->
-            Four
-
-        5 ->
-            Five
-
-        6 ->
-            Six
-
-        7 ->
-            Seven
-
-        8 ->
-            Eight
-
-        9 ->
-            Nine
-
-        10 ->
-            Ten
-
-        11 ->
-            Jack
-
-        12 ->
-            Queen
-
-        _ ->
-            King
 
 
 type Msg
@@ -247,173 +157,7 @@ showCardState : CardState -> String
 showCardState s =
     case s of
         CardState c FaceUp ->
-            showCard c
+            showCard True c
 
-        CardState _ _ ->
-            showCard CardBack
-
-
-showCard : Card -> String
-showCard c =
-    case c of
-        Card Spades Ace ->
-            "🂡"
-
-        Card Spades Two ->
-            "🂢"
-
-        Card Spades Three ->
-            "🂣"
-
-        Card Spades Four ->
-            "🂤"
-
-        Card Spades Five ->
-            "🂥"
-
-        Card Spades Six ->
-            "🂦"
-
-        Card Spades Seven ->
-            "🂧"
-
-        Card Spades Eight ->
-            "🂨"
-
-        Card Spades Nine ->
-            "🂩"
-
-        Card Spades Ten ->
-            "🂪"
-
-        Card Spades Jack ->
-            "🂫"
-
-        Card Spades Queen ->
-            "🂭"
-
-        Card Spades King ->
-            "🂮"
-
-        Card Hearts Ace ->
-            "🂱"
-
-        Card Hearts Two ->
-            "🂲"
-
-        Card Hearts Three ->
-            "🂳"
-
-        Card Hearts Four ->
-            "🂴"
-
-        Card Hearts Five ->
-            "🂵"
-
-        Card Hearts Six ->
-            "🂶"
-
-        Card Hearts Seven ->
-            "🂷"
-
-        Card Hearts Eight ->
-            "🂸"
-
-        Card Hearts Nine ->
-            "🂹"
-
-        Card Hearts Ten ->
-            "🂺"
-
-        Card Hearts Jack ->
-            "🂻"
-
-        Card Hearts Queen ->
-            "🂽"
-
-        Card Hearts King ->
-            "🂾"
-
-        Card Diamonds Ace ->
-            "🃁"
-
-        Card Diamonds Two ->
-            "🃂"
-
-        Card Diamonds Three ->
-            "🃃"
-
-        Card Diamonds Four ->
-            "🃄"
-
-        Card Diamonds Five ->
-            "🃅"
-
-        Card Diamonds Six ->
-            "🃆"
-
-        Card Diamonds Seven ->
-            "🃇"
-
-        Card Diamonds Eight ->
-            "🃈"
-
-        Card Diamonds Nine ->
-            "🃉"
-
-        Card Diamonds Ten ->
-            "🃊"
-
-        Card Diamonds Jack ->
-            "🃋"
-
-        Card Diamonds Queen ->
-            "🃍"
-
-        Card Diamonds King ->
-            "🃎"
-
-        Card Clubs Ace ->
-            "🃑"
-
-        Card Clubs Two ->
-            "🃒"
-
-        Card Clubs Three ->
-            "🃓"
-
-        Card Clubs Four ->
-            "🃔"
-
-        Card Clubs Five ->
-            "🃕"
-
-        Card Clubs Six ->
-            "🃖"
-
-        Card Clubs Seven ->
-            "🃗"
-
-        Card Clubs Eight ->
-            "🃘"
-
-        Card Clubs Nine ->
-            "🃙"
-
-        Card Clubs Ten ->
-            "🃚"
-
-        Card Clubs Jack ->
-            "🃛"
-
-        Card Clubs Queen ->
-            "🃝"
-
-        Card Clubs King ->
-            "🃞"
-
-        Joker ->
-            "🃟"
-
-        CardBack ->
-            "🂠"
+        CardState c _ ->
+            showCard False c
