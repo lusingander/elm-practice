@@ -11,12 +11,14 @@ main =
 
 
 type alias Model =
-    List Card
+    { cards : List Card
+    , clicked : Card
+    }
 
 
 init : Model
 init =
-    allCards
+    Model allCards (Card Spades 1)
 
 
 allCards : List Card
@@ -26,11 +28,15 @@ allCards =
 
 numberCards : Int -> List Card
 numberCards n =
-    [ Card Spades n, Card Hearts n, Card Diamonds n, Card Clubs n ]
+    [ Card Spades n
+    , Card Hearts n
+    , Card Diamonds n
+    , Card Clubs n
+    ]
 
 
 type Msg
-    = Open
+    = Open Card
 
 
 type Suit
@@ -47,13 +53,21 @@ type Card
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Open ->
-            model
+        Open c ->
+            { model | clicked = c }
 
 
 view : Model -> Html Msg
 view model =
-    div [] (viewCards model)
+    div [] (viewStatus model :: viewCards model.cards)
+
+
+viewStatus : Model -> Html Msg
+viewStatus model =
+    div []
+        [ span [ style "font-size" "1.5em" ] [ text "Last clicked: " ]
+        , span [ style "font-size" "5em" ] [ text (showCard model.clicked) ]
+        ]
 
 
 viewCards : List Card -> List (Html Msg)
@@ -73,7 +87,11 @@ viewCards cs =
 
 viewCard : Card -> Html Msg
 viewCard c =
-    span [ style "font-size" "6em" ] [ text (showCard c) ]
+    span
+        [ style "font-size" "6em"
+        , onClick (Open c)
+        ]
+        [ text (showCard c) ]
 
 
 showCard : Card -> String
