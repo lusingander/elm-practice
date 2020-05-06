@@ -18,7 +18,7 @@ type alias Model =
 
 init : Model
 init =
-    Model allCards (Card Spades 1)
+    Model allCards (Card Spades Ace)
 
 
 allCards : List Card
@@ -27,16 +27,25 @@ allCards =
 
 
 numberCards : Int -> List Card
-numberCards n =
-    [ Card Spades n
-    , Card Hearts n
-    , Card Diamonds n
-    , Card Clubs n
+numberCards =
+    numberToRank >> rankCards
+
+
+rankCards : Rank -> List Card
+rankCards r =
+    [ Card Spades r
+    , Card Hearts r
+    , Card Diamonds r
+    , Card Clubs r
     ]
 
 
 type Msg
     = Open Card
+
+
+type Card
+    = Card Suit Rank
 
 
 type Suit
@@ -46,8 +55,63 @@ type Suit
     | Clubs
 
 
-type Card
-    = Card Suit Int
+type Rank
+    = Ace
+    | Two
+    | Three
+    | Four
+    | Five
+    | Six
+    | Seven
+    | Eight
+    | Nine
+    | Ten
+    | Jack
+    | Queen
+    | King
+
+
+numberToRank : Int -> Rank
+numberToRank n =
+    case n of
+        1 ->
+            Ace
+
+        2 ->
+            Two
+
+        3 ->
+            Three
+
+        4 ->
+            Four
+
+        5 ->
+            Five
+
+        6 ->
+            Six
+
+        7 ->
+            Seven
+
+        8 ->
+            Eight
+
+        9 ->
+            Nine
+
+        10 ->
+            Ten
+
+        11 ->
+            Jack
+
+        12 ->
+            Queen
+
+        _ ->
+            King
 
 
 update : Msg -> Model -> Model
@@ -97,161 +161,158 @@ viewCard c =
 showCard : Card -> String
 showCard c =
     case c of
-        Card Spades 1 ->
+        Card Spades Ace ->
             "🂡"
 
-        Card Spades 2 ->
+        Card Spades Two ->
             "🂢"
 
-        Card Spades 3 ->
+        Card Spades Three ->
             "🂣"
 
-        Card Spades 4 ->
+        Card Spades Four ->
             "🂤"
 
-        Card Spades 5 ->
+        Card Spades Five ->
             "🂥"
 
-        Card Spades 6 ->
+        Card Spades Six ->
             "🂦"
 
-        Card Spades 7 ->
+        Card Spades Seven ->
             "🂧"
 
-        Card Spades 8 ->
+        Card Spades Eight ->
             "🂨"
 
-        Card Spades 9 ->
+        Card Spades Nine ->
             "🂩"
 
-        Card Spades 10 ->
+        Card Spades Ten ->
             "🂪"
 
-        Card Spades 11 ->
+        Card Spades Jack ->
             "🂫"
 
-        Card Spades 12 ->
+        Card Spades Queen ->
             "🂭"
 
-        Card Spades 13 ->
+        Card Spades King ->
             "🂮"
 
-        Card Hearts 1 ->
+        Card Hearts Ace ->
             "🂱"
 
-        Card Hearts 2 ->
+        Card Hearts Two ->
             "🂲"
 
-        Card Hearts 3 ->
+        Card Hearts Three ->
             "🂳"
 
-        Card Hearts 4 ->
+        Card Hearts Four ->
             "🂴"
 
-        Card Hearts 5 ->
+        Card Hearts Five ->
             "🂵"
 
-        Card Hearts 6 ->
+        Card Hearts Six ->
             "🂶"
 
-        Card Hearts 7 ->
+        Card Hearts Seven ->
             "🂷"
 
-        Card Hearts 8 ->
+        Card Hearts Eight ->
             "🂸"
 
-        Card Hearts 9 ->
+        Card Hearts Nine ->
             "🂹"
 
-        Card Hearts 10 ->
+        Card Hearts Ten ->
             "🂺"
 
-        Card Hearts 11 ->
+        Card Hearts Jack ->
             "🂻"
 
-        Card Hearts 12 ->
+        Card Hearts Queen ->
             "🂽"
 
-        Card Hearts 13 ->
+        Card Hearts King ->
             "🂾"
 
-        Card Diamonds 1 ->
+        Card Diamonds Ace ->
             "🃁"
 
-        Card Diamonds 2 ->
+        Card Diamonds Two ->
             "🃂"
 
-        Card Diamonds 3 ->
+        Card Diamonds Three ->
             "🃃"
 
-        Card Diamonds 4 ->
+        Card Diamonds Four ->
             "🃄"
 
-        Card Diamonds 5 ->
+        Card Diamonds Five ->
             "🃅"
 
-        Card Diamonds 6 ->
+        Card Diamonds Six ->
             "🃆"
 
-        Card Diamonds 7 ->
+        Card Diamonds Seven ->
             "🃇"
 
-        Card Diamonds 8 ->
+        Card Diamonds Eight ->
             "🃈"
 
-        Card Diamonds 9 ->
+        Card Diamonds Nine ->
             "🃉"
 
-        Card Diamonds 10 ->
+        Card Diamonds Ten ->
             "🃊"
 
-        Card Diamonds 11 ->
+        Card Diamonds Jack ->
             "🃋"
 
-        Card Diamonds 12 ->
+        Card Diamonds Queen ->
             "🃍"
 
-        Card Diamonds 13 ->
+        Card Diamonds King ->
             "🃎"
 
-        Card Clubs 1 ->
+        Card Clubs Ace ->
             "🃑"
 
-        Card Clubs 2 ->
+        Card Clubs Two ->
             "🃒"
 
-        Card Clubs 3 ->
+        Card Clubs Three ->
             "🃓"
 
-        Card Clubs 4 ->
+        Card Clubs Four ->
             "🃔"
 
-        Card Clubs 5 ->
+        Card Clubs Five ->
             "🃕"
 
-        Card Clubs 6 ->
+        Card Clubs Six ->
             "🃖"
 
-        Card Clubs 7 ->
+        Card Clubs Seven ->
             "🃗"
 
-        Card Clubs 8 ->
+        Card Clubs Eight ->
             "🃘"
 
-        Card Clubs 9 ->
+        Card Clubs Nine ->
             "🃙"
 
-        Card Clubs 10 ->
+        Card Clubs Ten ->
             "🃚"
 
-        Card Clubs 11 ->
+        Card Clubs Jack ->
             "🃛"
 
-        Card Clubs 12 ->
+        Card Clubs Queen ->
             "🃝"
 
-        Card Clubs 13 ->
+        Card Clubs King ->
             "🃞"
-
-        Card _ _ ->
-            "🂠"
