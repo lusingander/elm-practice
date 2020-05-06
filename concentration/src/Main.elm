@@ -61,17 +61,13 @@ faceUpCard originalCardState gameState =
 
 
 faceUp : CardState -> CardState
-faceUp s =
-    case s of
-        CardState c _ ->
-            CardState c FaceUp
+faceUp (CardState c _) =
+    CardState c FaceUp
 
 
 faceDown : CardState -> CardState
-faceDown s =
-    case s of
-        CardState c _ ->
-            CardState c FaceDown
+faceDown (CardState c _) =
+    CardState c FaceDown
 
 
 type alias GameState =
