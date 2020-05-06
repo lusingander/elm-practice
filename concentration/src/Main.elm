@@ -1,13 +1,20 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, span, text)
+import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import Random
+import Random.List exposing (shuffle)
 
 
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
 
 
 type alias Model =
@@ -16,9 +23,11 @@ type alias Model =
     }
 
 
-init : Model
-init =
-    Model allCards (Card Spades Ace)
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( Model allCards (Card Spades Ace)
+    , Cmd.none
+    )
 
 
 allCards : List Card
@@ -38,10 +47,6 @@ rankCards r =
     , Card Diamonds r
     , Card Clubs r
     ]
-
-
-type Msg
-    = Open Card
 
 
 type Card
@@ -114,21 +119,52 @@ numberToRank n =
             King
 
 
-update : Msg -> Model -> Model
+type Msg
+    = New (List Card)
+    | Open Card
+    | Shuffle
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        New cards ->
+            ( { model | cards = cards }
+            , Cmd.none
+            )
+
         Open c ->
-            { model | clicked = c }
+            ( { model | clicked = c }
+            , Cmd.none
+            )
+
+        Shuffle ->
+            ( model
+            , Random.generate New (shuffle model.cards)
+            )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 view : Model -> Html Msg
 view model =
-    div [] (viewStatus model :: viewCards model.cards)
+    div [] (viewControlArea model :: viewCards model.cards)
+
+
+viewControlArea : Model -> Html Msg
+viewControlArea model =
+    div []
+        [ viewStatus model
+        , button [ onClick Shuffle ] [ text "Reset" ]
+        ]
 
 
 viewStatus : Model -> Html Msg
 viewStatus model =
-    div []
+    span []
         [ span [ style "font-size" "1.5em" ] [ text "Last clicked: " ]
         , span [ style "font-size" "5em" ] [ text (showCard model.clicked) ]
         ]
