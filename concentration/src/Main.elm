@@ -18,16 +18,36 @@ main =
 
 
 type alias Model =
-    { cards : List Card
-    , lastClicked : Card
-    }
+    GameState
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model allCards CardBack
+    ( initGameState
     , Cmd.none
     )
+
+
+initGameState : GameState
+initGameState =
+    List.map initCardState allCards
+
+
+initCardState : Card -> CardState
+initCardState c =
+    CardState c FaceDown
+
+
+resetCardStates : List CardState -> List CardState
+resetCardStates ss =
+    List.map resetCardState ss
+
+
+resetCardState : CardState -> CardState
+resetCardState s =
+    case s of
+        CardState c _ ->
+            CardState c FaceDown
 
 
 allCards : List Card
@@ -47,6 +67,37 @@ rankCards r =
     , Card Diamonds r
     , Card Clubs r
     ]
+
+
+faceUpCard : CardState -> GameState -> GameState
+faceUpCard originalCardState gameState =
+    case gameState of
+        [] ->
+            []
+
+        s :: ss ->
+            case originalCardState of
+                CardState card _ ->
+                    (if originalCardState == s then
+                        CardState card FaceUp
+
+                     else
+                        s
+                    )
+                        :: faceUpCard originalCardState ss
+
+
+type alias GameState =
+    List CardState
+
+
+type CardState
+    = CardState Card FaceState
+
+
+type FaceState
+    = FaceUp
+    | FaceDown
 
 
 type Card
@@ -122,30 +173,27 @@ numberToRank n =
 
 
 type Msg
-    = New (List Card)
-    | Open Card
+    = New (List CardState)
+    | Open CardState
     | Shuffle
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        New cards ->
-            ( { model
-                | cards = cards
-                , lastClicked = CardBack
-              }
+        New cardStates ->
+            ( resetCardStates cardStates
             , Cmd.none
             )
 
-        Open c ->
-            ( { model | lastClicked = c }
+        Open cardState ->
+            ( faceUpCard cardState model
             , Cmd.none
             )
 
         Shuffle ->
             ( model
-            , Random.generate New (shuffle model.cards)
+            , Random.generate New (shuffle model)
             )
 
 
@@ -156,28 +204,19 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div [] (viewControlArea model :: viewCards model.cards)
+    div [] (viewControlArea model :: viewCards model)
 
 
 viewControlArea : Model -> Html Msg
-viewControlArea model =
+viewControlArea _ =
     div []
-        [ viewStatus model
-        , button [ onClick Shuffle ] [ text "Reset" ]
+        [ button [ onClick Shuffle ] [ text "Reset" ]
         ]
 
 
-viewStatus : Model -> Html Msg
-viewStatus model =
-    span []
-        [ span [ style "font-size" "1.5em" ] [ text "Last clicked: " ]
-        , span [ style "font-size" "5em" ] [ text (showCard model.lastClicked) ]
-        ]
-
-
-viewCards : List Card -> List (Html Msg)
-viewCards cs =
-    case cs of
+viewCards : List CardState -> List (Html Msg)
+viewCards ss =
+    case ss of
         [] ->
             []
 
@@ -185,18 +224,28 @@ viewCards cs =
             div []
                 (List.map
                     viewCard
-                    (List.take 13 cs)
+                    (List.take 13 ss)
                 )
-                :: viewCards (List.drop 13 cs)
+                :: viewCards (List.drop 13 ss)
 
 
-viewCard : Card -> Html Msg
-viewCard c =
+viewCard : CardState -> Html Msg
+viewCard s =
     span
         [ style "font-size" "6em"
-        , onClick (Open c)
+        , onClick (Open s)
         ]
-        [ text (showCard c) ]
+        [ text (showCardState s) ]
+
+
+showCardState : CardState -> String
+showCardState s =
+    case s of
+        CardState c FaceUp ->
+            showCard c
+
+        CardState _ _ ->
+            showCard CardBack
 
 
 showCard : Card -> String
