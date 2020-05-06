@@ -19,13 +19,13 @@ main =
 
 type alias Model =
     { cards : List Card
-    , clicked : Card
+    , lastClicked : Card
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model allCards (Card Spades Ace)
+    ( Model allCards CardBack
     , Cmd.none
     )
 
@@ -51,6 +51,8 @@ rankCards r =
 
 type Card
     = Card Suit Rank
+    | Joker
+    | CardBack
 
 
 type Suit
@@ -129,12 +131,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         New cards ->
-            ( { model | cards = cards }
+            ( { model
+                | cards = cards
+                , lastClicked = CardBack
+              }
             , Cmd.none
             )
 
         Open c ->
-            ( { model | clicked = c }
+            ( { model | lastClicked = c }
             , Cmd.none
             )
 
@@ -166,7 +171,7 @@ viewStatus : Model -> Html Msg
 viewStatus model =
     span []
         [ span [ style "font-size" "1.5em" ] [ text "Last clicked: " ]
-        , span [ style "font-size" "5em" ] [ text (showCard model.clicked) ]
+        , span [ style "font-size" "5em" ] [ text (showCard model.lastClicked) ]
         ]
 
 
@@ -352,3 +357,9 @@ showCard c =
 
         Card Clubs King ->
             "🃞"
+
+        Joker ->
+            "🃟"
+
+        CardBack ->
+            "🂠"
