@@ -23,7 +23,7 @@ init =
 
 allCards : List Card
 allCards =
-    List.concat (List.map numberCards (List.range 1 13))
+    List.range 1 13 |> List.map numberCards |> List.concat
 
 
 numberCards : Int -> List Card
