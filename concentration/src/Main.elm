@@ -39,15 +39,8 @@ initCardState c =
 
 
 resetCardStates : List CardState -> List CardState
-resetCardStates ss =
-    List.map resetCardState ss
-
-
-resetCardState : CardState -> CardState
-resetCardState s =
-    case s of
-        CardState c _ ->
-            CardState c FaceDown
+resetCardStates =
+    List.map faceDown
 
 
 allCards : List Card
@@ -76,15 +69,27 @@ faceUpCard originalCardState gameState =
             []
 
         s :: ss ->
-            case originalCardState of
-                CardState card _ ->
-                    (if originalCardState == s then
-                        CardState card FaceUp
+            (if originalCardState == s then
+                faceUp s
 
-                     else
-                        s
-                    )
-                        :: faceUpCard originalCardState ss
+             else
+                s
+            )
+                :: faceUpCard originalCardState ss
+
+
+faceUp : CardState -> CardState
+faceUp s =
+    case s of
+        CardState c _ ->
+            CardState c FaceUp
+
+
+faceDown : CardState -> CardState
+faceDown s =
+    case s of
+        CardState c _ ->
+            CardState c FaceDown
 
 
 type alias GameState =
