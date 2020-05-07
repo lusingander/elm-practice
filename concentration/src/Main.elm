@@ -268,7 +268,9 @@ cardStyle (CardState _ s) =
      else
         []
     )
-        ++ [ style "font-size" "6em" ]
+        ++ [ style "font-size" "6em"
+           , style "user-select" "none"
+           ]
 
 
 showCardState : CardState -> String
