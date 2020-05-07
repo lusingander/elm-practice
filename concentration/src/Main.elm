@@ -62,7 +62,7 @@ faceUpCard originalCardState gameState =
 
 faceUp : CardState -> CardState
 faceUp (CardState c _) =
-    CardState c FaceUp
+    CardState c TempFaceUp
 
 
 faceDown : CardState -> CardState
@@ -81,6 +81,7 @@ type CardState
 type FaceState
     = FaceUp
     | FaceDown
+    | TempFaceUp
 
 
 type Msg
@@ -143,17 +144,29 @@ viewCards ss =
 viewCard : CardState -> Html Msg
 viewCard s =
     span
-        [ style "font-size" "6em"
-        , onClick (Open s)
-        ]
+        (onClick
+            (Open s)
+            :: cardStyle s
+        )
         [ text (showCardState s) ]
+
+
+cardStyle : CardState -> List (Html.Attribute msg)
+cardStyle (CardState _ s) =
+    (if s == TempFaceUp then
+        [ style "color" "crimson" ]
+
+     else
+        []
+    )
+        ++ [ style "font-size" "6em" ]
 
 
 showCardState : CardState -> String
 showCardState s =
     case s of
-        CardState c FaceUp ->
-            showCard True c
+        CardState c FaceDown ->
+            showCard False c
 
         CardState c _ ->
-            showCard False c
+            showCard True c
