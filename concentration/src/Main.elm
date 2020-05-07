@@ -31,7 +31,10 @@ init _ =
 
 initGameState : GameState
 initGameState =
-    List.map initCardState allCards
+    { cardStates = List.map initCardState allCards
+    , lastOpened = Nothing
+    , turn = First
+    }
 
 
 initCardState : Card -> CardState
@@ -44,8 +47,29 @@ resetCardStates =
     List.map faceDown
 
 
+cardFromState : CardState -> Card
+cardFromState (CardState c _) =
+    c
+
+
 faceUpCard : CardState -> GameState -> GameState
 faceUpCard originalCardState gameState =
+    let
+        (CardState _ state) =
+            originalCardState
+    in
+    if state == FaceDown || .turn gameState == Wait then
+        { cardStates = faceUpSingleCard originalCardState gameState.cardStates |> faceDownAllTempFaceUpCardsIfNeed gameState.turn
+        , lastOpened = Just (cardFromState originalCardState)
+        , turn = next gameState.turn
+        }
+
+    else
+        gameState
+
+
+faceUpSingleCard : CardState -> List CardState -> List CardState
+faceUpSingleCard originalCardState gameState =
     case gameState of
         [] ->
             []
@@ -57,7 +81,7 @@ faceUpCard originalCardState gameState =
              else
                 s
             )
-                :: faceUpCard originalCardState ss
+                :: faceUpSingleCard originalCardState ss
 
 
 faceUp : CardState -> CardState
@@ -70,8 +94,40 @@ faceDown (CardState c _) =
     CardState c FaceDown
 
 
+faceDownAllTempFaceUpCardsIfNeed : Turn -> List CardState -> List CardState
+faceDownAllTempFaceUpCardsIfNeed turn cardStates =
+    if turn == Wait then
+        cardStates |> faceDownAllTempFaceUpCards
+
+    else
+        cardStates
+
+
+faceDownAllTempFaceUpCards : List CardState -> List CardState
+faceDownAllTempFaceUpCards cardStates =
+    case cardStates of
+        [] ->
+            []
+
+        s :: ss ->
+            let
+                (CardState card face) =
+                    s
+            in
+            (if face == TempFaceUp then
+                CardState card FaceDown
+
+             else
+                s
+            )
+                :: faceDownAllTempFaceUpCards ss
+
+
 type alias GameState =
-    List CardState
+    { cardStates : List CardState
+    , lastOpened : Maybe Card
+    , turn : Turn
+    }
 
 
 type CardState
@@ -84,6 +140,25 @@ type FaceState
     | TempFaceUp
 
 
+type Turn
+    = First
+    | Second
+    | Wait
+
+
+next : Turn -> Turn
+next t =
+    case t of
+        First ->
+            Second
+
+        Second ->
+            Wait
+
+        Wait ->
+            First
+
+
 type Msg
     = New (List CardState)
     | Open CardState
@@ -94,7 +169,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         New cardStates ->
-            ( resetCardStates cardStates
+            ( { cardStates = resetCardStates cardStates
+              , lastOpened = Nothing
+              , turn = First
+              }
             , Cmd.none
             )
 
@@ -105,7 +183,7 @@ update msg model =
 
         Shuffle ->
             ( model
-            , Random.generate New (shuffle model)
+            , Random.generate New (shuffle model.cardStates)
             )
 
 
@@ -116,7 +194,7 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div [] (viewControlArea model :: viewCards model)
+    div [] (viewControlArea model :: viewCards model.cardStates)
 
 
 viewControlArea : Model -> Html Msg
