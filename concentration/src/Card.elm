@@ -1,4 +1,4 @@
-module Card exposing (Card, allCards, showCard)
+module Card exposing (Card, allCards, numberEquals, showCard)
 
 
 type Card
@@ -72,6 +72,59 @@ numberToRank n =
             King
 
 
+rankToNumber : Rank -> Int
+rankToNumber r =
+    case r of
+        Ace ->
+            1
+
+        Two ->
+            2
+
+        Three ->
+            3
+
+        Four ->
+            4
+
+        Five ->
+            5
+
+        Six ->
+            6
+
+        Seven ->
+            7
+
+        Eight ->
+            8
+
+        Nine ->
+            9
+
+        Ten ->
+            10
+
+        Jack ->
+            11
+
+        Queen ->
+            12
+
+        King ->
+            13
+
+
+cardNumber : Card -> Int
+cardNumber c =
+    case c of
+        Card _ r ->
+            rankToNumber r
+
+        Joker ->
+            0
+
+
 allCards : List Card
 allCards =
     List.range 1 13 |> List.map numberCards |> List.concat
@@ -89,6 +142,11 @@ rankCards r =
     , Card Diamonds r
     , Card Clubs r
     ]
+
+
+numberEquals : Card -> Card -> Bool
+numberEquals c1 c2 =
+    cardNumber c1 == cardNumber c2
 
 
 showCard : Bool -> Card -> String

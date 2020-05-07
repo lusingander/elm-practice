@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Card exposing (Card, allCards, showCard)
+import Card exposing (Card, allCards, numberEquals, showCard)
 import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
@@ -52,16 +52,49 @@ cardFromState (CardState c _) =
     c
 
 
+lastOpenedNumberIsEqualTo : Card -> GameState -> Bool
+lastOpenedNumberIsEqualTo c gameState =
+    let
+        lastOpened =
+            .lastOpened gameState
+    in
+    case lastOpened of
+        Just n ->
+            numberEquals c n
+
+        Nothing ->
+            False
+
+
 faceUpCard : CardState -> GameState -> GameState
 faceUpCard originalCardState gameState =
     let
-        (CardState _ state) =
+        (CardState card state) =
             originalCardState
     in
-    if state == FaceDown || .turn gameState == Wait then
-        { cardStates = faceUpSingleCard originalCardState gameState.cardStates |> faceDownAllTempFaceUpCardsIfNeed gameState.turn
+    if .turn gameState == First && state == FaceDown then
+        { cardStates = faceUpSingleCard originalCardState gameState.cardStates
         , lastOpened = Just (cardFromState originalCardState)
-        , turn = next gameState.turn
+        , turn = Second
+        }
+
+    else if .turn gameState == Second && state == FaceDown then
+        if lastOpenedNumberIsEqualTo card gameState then
+            { cardStates = faceUpSingleCard originalCardState gameState.cardStates |> faceUpAllTempFaceUpCards
+            , lastOpened = Nothing
+            , turn = First
+            }
+
+        else
+            { cardStates = faceUpSingleCard originalCardState gameState.cardStates
+            , lastOpened = Just (cardFromState originalCardState)
+            , turn = Wait
+            }
+
+    else if .turn gameState == Wait then
+        { cardStates = .cardStates gameState |> faceDownAllTempFaceUpCards
+        , lastOpened = Nothing
+        , turn = First
         }
 
     else
@@ -94,13 +127,24 @@ faceDown (CardState c _) =
     CardState c FaceDown
 
 
-faceDownAllTempFaceUpCardsIfNeed : Turn -> List CardState -> List CardState
-faceDownAllTempFaceUpCardsIfNeed turn cardStates =
-    if turn == Wait then
-        cardStates |> faceDownAllTempFaceUpCards
+faceUpAllTempFaceUpCards : List CardState -> List CardState
+faceUpAllTempFaceUpCards cardStates =
+    case cardStates of
+        [] ->
+            []
 
-    else
-        cardStates
+        s :: ss ->
+            let
+                (CardState card face) =
+                    s
+            in
+            (if face == TempFaceUp then
+                CardState card FaceUp
+
+             else
+                s
+            )
+                :: faceUpAllTempFaceUpCards ss
 
 
 faceDownAllTempFaceUpCards : List CardState -> List CardState
@@ -144,19 +188,6 @@ type Turn
     = First
     | Second
     | Wait
-
-
-next : Turn -> Turn
-next t =
-    case t of
-        First ->
-            Second
-
-        Second ->
-            Wait
-
-        Wait ->
-            First
 
 
 type Msg
