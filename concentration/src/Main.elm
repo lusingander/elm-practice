@@ -265,6 +265,9 @@ cardStyle (CardState _ s) =
     (if s == TempFaceUp then
         [ style "color" "crimson" ]
 
+     else if s == FaceDown then
+        [ style "cursor" "pointer" ]
+
      else
         []
     )
