@@ -127,21 +127,17 @@ cardNumber c =
 
 allCards : List Card
 allCards =
-    List.range 1 13 |> List.map numberCards |> List.concat
+    List.concat
+        [ suitCards Spades
+        , suitCards Hearts
+        , suitCards Diamonds
+        , suitCards Clubs
+        ]
 
 
-numberCards : Int -> List Card
-numberCards =
-    numberToRank >> rankCards
-
-
-rankCards : Rank -> List Card
-rankCards r =
-    [ Card Spades r
-    , Card Hearts r
-    , Card Diamonds r
-    , Card Clubs r
-    ]
+suitCards : Suit -> List Card
+suitCards s =
+    List.map (numberToRank >> Card s) <| List.range 1 13
 
 
 numberEquals : Card -> Card -> Bool
