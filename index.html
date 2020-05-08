@@ -5242,6 +5242,10 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$First = {$: 'First'};
+var $author$project$Card$Clubs = {$: 'Clubs'};
+var $author$project$Card$Diamonds = {$: 'Diamonds'};
+var $author$project$Card$Hearts = {$: 'Hearts'};
+var $author$project$Card$Spades = {$: 'Spades'};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5253,6 +5257,10 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
+var $author$project$Card$Card = F2(
+	function (a, b) {
+		return {$: 'Card', a: a, b: b};
+	});
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -5301,29 +5309,23 @@ var $author$project$Card$numberToRank = function (n) {
 			return $author$project$Card$King;
 	}
 };
-var $author$project$Card$Card = F2(
-	function (a, b) {
-		return {$: 'Card', a: a, b: b};
-	});
-var $author$project$Card$Clubs = {$: 'Clubs'};
-var $author$project$Card$Diamonds = {$: 'Diamonds'};
-var $author$project$Card$Hearts = {$: 'Hearts'};
-var $author$project$Card$Spades = {$: 'Spades'};
-var $author$project$Card$rankCards = function (r) {
-	return _List_fromArray(
-		[
-			A2($author$project$Card$Card, $author$project$Card$Spades, r),
-			A2($author$project$Card$Card, $author$project$Card$Hearts, r),
-			A2($author$project$Card$Card, $author$project$Card$Diamonds, r),
-			A2($author$project$Card$Card, $author$project$Card$Clubs, r)
-		]);
-};
-var $author$project$Card$numberCards = A2($elm$core$Basics$composeR, $author$project$Card$numberToRank, $author$project$Card$rankCards);
-var $author$project$Card$allCards = $elm$core$List$concat(
-	A2(
+var $author$project$Card$suitCards = function (s) {
+	return A2(
 		$elm$core$List$map,
-		$author$project$Card$numberCards,
-		A2($elm$core$List$range, 1, 13)));
+		A2(
+			$elm$core$Basics$composeR,
+			$author$project$Card$numberToRank,
+			$author$project$Card$Card(s)),
+		A2($elm$core$List$range, 1, 13));
+};
+var $author$project$Card$allCards = $elm$core$List$concat(
+	_List_fromArray(
+		[
+			$author$project$Card$suitCards($author$project$Card$Spades),
+			$author$project$Card$suitCards($author$project$Card$Hearts),
+			$author$project$Card$suitCards($author$project$Card$Diamonds),
+			$author$project$Card$suitCards($author$project$Card$Clubs)
+		]));
 var $author$project$Main$CardState = F2(
 	function (a, b) {
 		return {$: 'CardState', a: a, b: b};
@@ -6208,7 +6210,10 @@ var $author$project$Main$cardStyle = function (_v0) {
 		_Utils_eq(s, $author$project$Main$TempFaceUp) ? _List_fromArray(
 			[
 				A2($elm$html$Html$Attributes$style, 'color', 'crimson')
-			]) : _List_Nil,
+			]) : (_Utils_eq(s, $author$project$Main$FaceDown) ? _List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+			]) : _List_Nil),
 		_List_fromArray(
 			[
 				A2($elm$html$Html$Attributes$style, 'font-size', '6em'),
