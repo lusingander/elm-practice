@@ -39,7 +39,7 @@ initGameState =
 
 initCardState : Card -> CardState
 initCardState c =
-    CardState c FaceDown
+    CardState c FaceUp
 
 
 resetCardStates : List CardState -> List CardState
