@@ -29,6 +29,29 @@ init _ =
     )
 
 
+type alias GameState =
+    { cardStates : List CardState
+    , lastOpened : Maybe Card
+    , turn : Turn
+    }
+
+
+type CardState
+    = CardState Card FaceState
+
+
+type FaceState
+    = FaceUp
+    | FaceDown
+    | TempFaceUp
+
+
+type Turn
+    = First
+    | Second
+    | Wait
+
+
 initGameState : GameState
 initGameState =
     { cardStates = List.map initCardState allCards
@@ -165,29 +188,6 @@ faceDownAllTempFaceUpCards cardStates =
                 s
             )
                 :: faceDownAllTempFaceUpCards ss
-
-
-type alias GameState =
-    { cardStates : List CardState
-    , lastOpened : Maybe Card
-    , turn : Turn
-    }
-
-
-type CardState
-    = CardState Card FaceState
-
-
-type FaceState
-    = FaceUp
-    | FaceDown
-    | TempFaceUp
-
-
-type Turn
-    = First
-    | Second
-    | Wait
 
 
 type Msg
