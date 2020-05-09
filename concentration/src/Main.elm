@@ -9,6 +9,7 @@ import Random
 import Random.List exposing (shuffle)
 
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
