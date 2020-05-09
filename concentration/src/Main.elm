@@ -57,7 +57,7 @@ type Turn
 
 type GameMode
     = Normal
-    | Random
+    | Scattered
 
 
 type alias ShowState =
@@ -218,7 +218,7 @@ faceDownAllTempFaceUpCards cardStates =
 type Msg
     = New (List CardState)
     | Open CardState
-    | Shuffle
+    | Shuffle GameMode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -238,8 +238,10 @@ update msg model =
             , Cmd.none
             )
 
-        Shuffle ->
-            ( model
+        Shuffle gm ->
+            ( { model
+                | gameMode = gm
+              }
             , Random.generate New (Random.andThen shuffle <| randomCardStates model.cardStates)
             )
 
@@ -282,7 +284,8 @@ view model =
 viewControlArea : Model -> Html Msg
 viewControlArea _ =
     div []
-        [ button [ onClick Shuffle ] [ text "Reset" ]
+        [ button [ onClick <| Shuffle Normal ] [ text "Reset" ]
+        , button [ onClick <| Shuffle Scattered ] [ text "Reset (Scattered)" ]
         ]
 
 
@@ -325,7 +328,7 @@ cardStyle gm (CardState _ f s) =
             else
                 []
            )
-        ++ (if gm == Random then
+        ++ (if gm == Scattered then
                 [ style "transform" <| transformStyleString (.rotateDeg s) (.positionX s) (.positionY s)
                 , style "display" "inline-block"
                 ]
