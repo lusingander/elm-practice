@@ -5242,6 +5242,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$First = {$: 'First'};
+var $author$project$Main$Normal = {$: 'Normal'};
 var $author$project$Card$Clubs = {$: 'Clubs'};
 var $author$project$Card$Diamonds = {$: 'Diamonds'};
 var $author$project$Card$Hearts = {$: 'Hearts'};
@@ -5326,16 +5327,22 @@ var $author$project$Card$allCards = $elm$core$List$concat(
 			$author$project$Card$suitCards($author$project$Card$Diamonds),
 			$author$project$Card$suitCards($author$project$Card$Clubs)
 		]));
-var $author$project$Main$CardState = F2(
-	function (a, b) {
-		return {$: 'CardState', a: a, b: b};
+var $author$project$Main$CardState = F3(
+	function (a, b, c) {
+		return {$: 'CardState', a: a, b: b, c: c};
 	});
 var $author$project$Main$FaceUp = {$: 'FaceUp'};
+var $author$project$Main$ShowState = F4(
+	function (mouseOvered, rotateDeg, positionX, positionY) {
+		return {mouseOvered: mouseOvered, positionX: positionX, positionY: positionY, rotateDeg: rotateDeg};
+	});
+var $author$project$Main$initShowState = A4($author$project$Main$ShowState, false, 0, 0, 0);
 var $author$project$Main$initCardState = function (c) {
-	return A2($author$project$Main$CardState, c, $author$project$Main$FaceUp);
+	return A3($author$project$Main$CardState, c, $author$project$Main$FaceUp, $author$project$Main$initShowState);
 };
 var $author$project$Main$initGameState = {
 	cardStates: A2($elm$core$List$map, $author$project$Main$initCardState, $author$project$Card$allCards),
+	gameMode: $author$project$Main$Normal,
 	lastOpened: $elm$core$Maybe$Nothing,
 	turn: $author$project$Main$First
 };
@@ -5352,6 +5359,22 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$New = function (a) {
 	return {$: 'New', a: a};
 };
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$andThen = F2(
+	function (callback, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				var _v1 = genA(seed);
+				var result = _v1.a;
+				var newSeed = _v1.b;
+				var _v2 = callback(result);
+				var genB = _v2.a;
+				return genB(newSeed);
+			});
+	});
 var $author$project$Main$FaceDown = {$: 'FaceDown'};
 var $author$project$Main$Second = {$: 'Second'};
 var $author$project$Main$Wait = {$: 'Wait'};
@@ -5369,9 +5392,10 @@ var $author$project$Main$faceDownAllTempFaceUpCards = function (cardStates) {
 		var _v1 = s;
 		var card = _v1.a;
 		var face = _v1.b;
+		var show = _v1.c;
 		return A2(
 			$elm$core$List$cons,
-			_Utils_eq(face, $author$project$Main$TempFaceUp) ? A2($author$project$Main$CardState, card, $author$project$Main$FaceDown) : s,
+			_Utils_eq(face, $author$project$Main$TempFaceUp) ? A3($author$project$Main$CardState, card, $author$project$Main$FaceDown, show) : s,
 			$author$project$Main$faceDownAllTempFaceUpCards(ss));
 	}
 };
@@ -5384,15 +5408,17 @@ var $author$project$Main$faceUpAllTempFaceUpCards = function (cardStates) {
 		var _v1 = s;
 		var card = _v1.a;
 		var face = _v1.b;
+		var show = _v1.c;
 		return A2(
 			$elm$core$List$cons,
-			_Utils_eq(face, $author$project$Main$TempFaceUp) ? A2($author$project$Main$CardState, card, $author$project$Main$FaceUp) : s,
+			_Utils_eq(face, $author$project$Main$TempFaceUp) ? A3($author$project$Main$CardState, card, $author$project$Main$FaceUp, show) : s,
 			$author$project$Main$faceUpAllTempFaceUpCards(ss));
 	}
 };
 var $author$project$Main$faceUp = function (_v0) {
 	var c = _v0.a;
-	return A2($author$project$Main$CardState, c, $author$project$Main$TempFaceUp);
+	var s = _v0.c;
+	return A3($author$project$Main$CardState, c, $author$project$Main$TempFaceUp, s);
 };
 var $author$project$Main$faceUpSingleCard = F2(
 	function (originalCardState, gameState) {
@@ -5472,37 +5498,45 @@ var $author$project$Main$faceUpCard = F2(
 			function ($) {
 				return $.turn;
 			}(gameState),
-			$author$project$Main$First) && _Utils_eq(state, $author$project$Main$FaceDown)) ? {
-			cardStates: A2($author$project$Main$faceUpSingleCard, originalCardState, gameState.cardStates),
-			lastOpened: $elm$core$Maybe$Just(
-				$author$project$Main$cardFromState(originalCardState)),
-			turn: $author$project$Main$Second
-		} : ((_Utils_eq(
+			$author$project$Main$First) && _Utils_eq(state, $author$project$Main$FaceDown)) ? _Utils_update(
+			gameState,
+			{
+				cardStates: A2($author$project$Main$faceUpSingleCard, originalCardState, gameState.cardStates),
+				lastOpened: $elm$core$Maybe$Just(
+					$author$project$Main$cardFromState(originalCardState)),
+				turn: $author$project$Main$Second
+			}) : ((_Utils_eq(
 			function ($) {
 				return $.turn;
 			}(gameState),
-			$author$project$Main$Second) && _Utils_eq(state, $author$project$Main$FaceDown)) ? (A2($author$project$Main$lastOpenedNumberIsEqualTo, card, gameState) ? {
-			cardStates: $author$project$Main$faceUpAllTempFaceUpCards(
-				A2($author$project$Main$faceUpSingleCard, originalCardState, gameState.cardStates)),
-			lastOpened: $elm$core$Maybe$Nothing,
-			turn: $author$project$Main$First
-		} : {
-			cardStates: A2($author$project$Main$faceUpSingleCard, originalCardState, gameState.cardStates),
-			lastOpened: $elm$core$Maybe$Just(
-				$author$project$Main$cardFromState(originalCardState)),
-			turn: $author$project$Main$Wait
-		}) : (_Utils_eq(
+			$author$project$Main$Second) && _Utils_eq(state, $author$project$Main$FaceDown)) ? (A2($author$project$Main$lastOpenedNumberIsEqualTo, card, gameState) ? _Utils_update(
+			gameState,
+			{
+				cardStates: $author$project$Main$faceUpAllTempFaceUpCards(
+					A2($author$project$Main$faceUpSingleCard, originalCardState, gameState.cardStates)),
+				lastOpened: $elm$core$Maybe$Nothing,
+				turn: $author$project$Main$First
+			}) : _Utils_update(
+			gameState,
+			{
+				cardStates: A2($author$project$Main$faceUpSingleCard, originalCardState, gameState.cardStates),
+				lastOpened: $elm$core$Maybe$Just(
+					$author$project$Main$cardFromState(originalCardState)),
+				turn: $author$project$Main$Wait
+			})) : (_Utils_eq(
 			function ($) {
 				return $.turn;
 			}(gameState),
-			$author$project$Main$Wait) ? {
-			cardStates: $author$project$Main$faceDownAllTempFaceUpCards(
-				function ($) {
-					return $.cardStates;
-				}(gameState)),
-			lastOpened: $elm$core$Maybe$Nothing,
-			turn: $author$project$Main$First
-		} : gameState));
+			$author$project$Main$Wait) ? _Utils_update(
+			gameState,
+			{
+				cardStates: $author$project$Main$faceDownAllTempFaceUpCards(
+					function ($) {
+						return $.cardStates;
+					}(gameState)),
+				lastOpened: $elm$core$Maybe$Nothing,
+				turn: $author$project$Main$First
+			}) : gameState));
 	});
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
@@ -5581,9 +5615,6 @@ var $elm$random$Random$onSelfMsg = F3(
 	function (_v0, _v1, seed) {
 		return $elm$core$Task$succeed(seed);
 	});
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
 var $elm$random$Random$map = F2(
 	function (func, _v0) {
 		var genA = _v0.a;
@@ -5611,46 +5642,100 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
-var $author$project$Main$faceDown = function (_v0) {
-	var c = _v0.a;
-	return A2($author$project$Main$CardState, c, $author$project$Main$FaceDown);
-};
-var $author$project$Main$resetCardStates = $elm$core$List$map($author$project$Main$faceDown);
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
+var $author$project$Main$updateMouserOveredState = F3(
+	function (mouseOvered, originalCardState, cardStates) {
+		if (!cardStates.b) {
+			return _List_Nil;
+		} else {
+			var x = cardStates.a;
+			var xs = cardStates.b;
+			return A2(
+				$elm$core$List$cons,
+				function () {
+					if (_Utils_eq(originalCardState, x)) {
+						var _v1 = originalCardState;
+						var c = _v1.a;
+						var f = _v1.b;
+						var s = _v1.c;
+						return A3(
+							$author$project$Main$CardState,
+							c,
+							f,
+							_Utils_update(
+								s,
+								{mouseOvered: mouseOvered}));
+					} else {
+						return x;
+					}
+				}(),
+				A3($author$project$Main$updateMouserOveredState, mouseOvered, originalCardState, xs));
 		}
 	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
+var $author$project$Main$mouseEnterToCard = F2(
+	function (s, cs) {
+		return A3($author$project$Main$updateMouserOveredState, true, s, cs);
+	});
+var $author$project$Main$mouseLeaveFromCard = F2(
+	function (s, cs) {
+		return A3($author$project$Main$updateMouserOveredState, false, s, cs);
+	});
+var $elm$random$Random$constant = function (value) {
+	return $elm$random$Random$Generator(
+		function (seed) {
+			return _Utils_Tuple2(value, seed);
+		});
+};
+var $elm$random$Random$map2 = F3(
+	function (func, _v0, _v1) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v2 = genA(seed0);
+				var a = _v2.a;
+				var seed1 = _v2.b;
+				var _v3 = genB(seed1);
+				var b = _v3.a;
+				var seed2 = _v3.b;
+				return _Utils_Tuple2(
+					A2(func, a, b),
+					seed2);
+			});
+	});
+var $elm_community$random_extra$Random$Extra$combine = function (generators) {
+	if (!generators.b) {
+		return $elm$random$Random$constant(_List_Nil);
 	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+		var g = generators.a;
+		var gs = generators.b;
+		return A3(
+			$elm$random$Random$map2,
+			$elm$core$List$cons,
+			g,
+			$elm_community$random_extra$Random$Extra$combine(gs));
 	}
 };
+var $elm$random$Random$map3 = F4(
+	function (func, _v0, _v1, _v2) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		var genC = _v2.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v3 = genA(seed0);
+				var a = _v3.a;
+				var seed1 = _v3.b;
+				var _v4 = genB(seed1);
+				var b = _v4.a;
+				var seed2 = _v4.b;
+				var _v5 = genC(seed2);
+				var c = _v5.a;
+				var seed3 = _v5.b;
+				return _Utils_Tuple2(
+					A3(func, a, b, c),
+					seed3);
+			});
+	});
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5693,6 +5778,73 @@ var $elm$random$Random$int = F2(
 				}
 			});
 	});
+var $author$project$Main$randomDegree = A2($elm$random$Random$int, 0, 359);
+var $author$project$Main$randomPosition = A2($elm$random$Random$int, 0, 300);
+var $author$project$Main$randomShowState = function (mouseOvered) {
+	return A4(
+		$elm$random$Random$map3,
+		$author$project$Main$ShowState(mouseOvered),
+		$author$project$Main$randomDegree,
+		$author$project$Main$randomPosition,
+		$author$project$Main$randomPosition);
+};
+var $author$project$Main$randomCardState = function (_v0) {
+	var c = _v0.a;
+	var f = _v0.b;
+	var s = _v0.c;
+	return A2(
+		$elm$random$Random$map,
+		A2($author$project$Main$CardState, c, f),
+		$author$project$Main$randomShowState(
+			function ($) {
+				return $.mouseOvered;
+			}(s)));
+};
+var $author$project$Main$randomCardStates = function (cs) {
+	return $elm_community$random_extra$Random$Extra$combine(
+		A2($elm$core$List$map, $author$project$Main$randomCardState, cs));
+};
+var $author$project$Main$faceDown = function (_v0) {
+	var c = _v0.a;
+	var s = _v0.c;
+	return A3($author$project$Main$CardState, c, $author$project$Main$FaceDown, s);
+};
+var $author$project$Main$resetCardStates = $elm$core$List$map($author$project$Main$faceDown);
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
@@ -6031,24 +6183,60 @@ var $author$project$Main$update = F2(
 			case 'New':
 				var cardStates = msg.a;
 				return _Utils_Tuple2(
-					{
-						cardStates: $author$project$Main$resetCardStates(cardStates),
-						lastOpened: $elm$core$Maybe$Nothing,
-						turn: $author$project$Main$First
-					},
+					_Utils_update(
+						model,
+						{
+							cardStates: $author$project$Main$resetCardStates(cardStates),
+							lastOpened: $elm$core$Maybe$Nothing,
+							turn: $author$project$Main$First
+						}),
 					$elm$core$Platform$Cmd$none);
 			case 'Open':
 				var cardState = msg.a;
 				return _Utils_Tuple2(
 					A2($author$project$Main$faceUpCard, cardState, model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'MouseEnter':
+				var cardState = msg.a;
 				return _Utils_Tuple2(
-					model,
+					_Utils_update(
+						model,
+						{
+							cardStates: A2(
+								$author$project$Main$mouseEnterToCard,
+								cardState,
+								function ($) {
+									return $.cardStates;
+								}(model))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'MouseLeave':
+				var cardState = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							cardStates: A2(
+								$author$project$Main$mouseLeaveFromCard,
+								cardState,
+								function ($) {
+									return $.cardStates;
+								}(model))
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var gm = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{gameMode: gm}),
 					A2(
 						$elm$random$Random$generate,
 						$author$project$Main$New,
-						$elm_community$random_extra$Random$List$shuffle(model.cardStates)));
+						A2(
+							$elm$random$Random$andThen,
+							$elm_community$random_extra$Random$List$shuffle,
+							$author$project$Main$randomCardStates(model.cardStates))));
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
@@ -6199,27 +6387,66 @@ var $elm$core$List$take = F2(
 	function (n, list) {
 		return A3($elm$core$List$takeFast, 0, n, list);
 	});
+var $author$project$Main$MouseEnter = function (a) {
+	return {$: 'MouseEnter', a: a};
+};
+var $author$project$Main$MouseLeave = function (a) {
+	return {$: 'MouseLeave', a: a};
+};
 var $author$project$Main$Open = function (a) {
 	return {$: 'Open', a: a};
 };
+var $author$project$Main$Scattered = {$: 'Scattered'};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$cardStyle = function (_v0) {
-	var s = _v0.b;
-	return _Utils_ap(
-		_Utils_eq(s, $author$project$Main$TempFaceUp) ? _List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'color', 'crimson')
-			]) : (_Utils_eq(s, $author$project$Main$FaceDown) ? _List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
-			]) : _List_Nil),
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'font-size', '6em'),
-				A2($elm$html$Html$Attributes$style, 'user-select', 'none')
-			]));
-};
+var $author$project$Main$transformStyleString = F3(
+	function (d, x, y) {
+		return 'translate(' + ($elm$core$String$fromInt(x) + ('px, ' + ($elm$core$String$fromInt(y) + ('px) rotate(' + ($elm$core$String$fromInt(d) + 'deg)')))));
+	});
+var $author$project$Main$cardStyle = F2(
+	function (gm, _v0) {
+		var f = _v0.b;
+		var s = _v0.c;
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'font-size', '6em'),
+					A2($elm$html$Html$Attributes$style, 'user-select', 'none')
+				]),
+			_Utils_ap(
+				_Utils_eq(f, $author$project$Main$TempFaceUp) ? _List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'color', 'crimson')
+					]) : (_Utils_eq(f, $author$project$Main$FaceDown) ? _List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'cursor', 'pointer')
+					]) : _List_Nil),
+				_Utils_ap(
+					(function ($) {
+						return $.mouseOvered;
+					}(s) && _Utils_eq(f, $author$project$Main$FaceDown)) ? _List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'color', 'skyblue')
+						]) : _List_Nil,
+					_Utils_eq(gm, $author$project$Main$Scattered) ? _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$Attributes$style,
+							'transform',
+							A3(
+								$author$project$Main$transformStyleString,
+								function ($) {
+									return $.rotateDeg;
+								}(s),
+								function ($) {
+									return $.positionX;
+								}(s),
+								function ($) {
+									return $.positionY;
+								}(s))),
+							A2($elm$html$Html$Attributes$style, 'display', 'inline-block')
+						]) : _List_Nil)));
+	});
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6235,6 +6462,18 @@ var $elm$html$Html$Events$onClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
 		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$onMouseEnter = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'mouseenter',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$onMouseLeave = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'mouseleave',
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$core$Basics$not = _Basics_not;
@@ -6484,38 +6723,52 @@ var $author$project$Main$showCardState = function (s) {
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$viewCard = function (s) {
-	return A2(
-		$elm$html$Html$span,
-		A2(
-			$elm$core$List$cons,
-			$elm$html$Html$Events$onClick(
-				$author$project$Main$Open(s)),
-			$author$project$Main$cardStyle(s)),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(
-				$author$project$Main$showCardState(s))
-			]));
-};
-var $author$project$Main$viewCards = function (ss) {
-	if (!ss.b) {
-		return _List_Nil;
-	} else {
+var $author$project$Main$viewCard = F2(
+	function (gm, s) {
 		return A2(
-			$elm$core$List$cons,
+			$elm$html$Html$span,
 			A2(
-				$elm$html$Html$div,
-				_List_Nil,
+				$elm$core$List$cons,
+				$elm$html$Html$Events$onClick(
+					$author$project$Main$Open(s)),
 				A2(
-					$elm$core$List$map,
-					$author$project$Main$viewCard,
-					A2($elm$core$List$take, 13, ss))),
-			$author$project$Main$viewCards(
-				A2($elm$core$List$drop, 13, ss)));
-	}
+					$elm$core$List$cons,
+					$elm$html$Html$Events$onMouseEnter(
+						$author$project$Main$MouseEnter(s)),
+					A2(
+						$elm$core$List$cons,
+						$elm$html$Html$Events$onMouseLeave(
+							$author$project$Main$MouseLeave(s)),
+						A2($author$project$Main$cardStyle, gm, s)))),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$author$project$Main$showCardState(s))
+				]));
+	});
+var $author$project$Main$viewCards = F2(
+	function (gm, ss) {
+		if (!ss.b) {
+			return _List_Nil;
+		} else {
+			return A2(
+				$elm$core$List$cons,
+				A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						$author$project$Main$viewCard(gm),
+						A2($elm$core$List$take, 13, ss))),
+				A2(
+					$author$project$Main$viewCards,
+					gm,
+					A2($elm$core$List$drop, 13, ss)));
+		}
+	});
+var $author$project$Main$Shuffle = function (a) {
+	return {$: 'Shuffle', a: a};
 };
-var $author$project$Main$Shuffle = {$: 'Shuffle'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$Main$viewControlArea = function (_v0) {
 	return A2(
@@ -6527,11 +6780,23 @@ var $author$project$Main$viewControlArea = function (_v0) {
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onClick($author$project$Main$Shuffle)
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$Shuffle($author$project$Main$Normal))
 					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Reset')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$Shuffle($author$project$Main$Scattered))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Reset (Scattered)')
 					]))
 			]));
 };
@@ -6542,7 +6807,7 @@ var $author$project$Main$view = function (model) {
 		A2(
 			$elm$core$List$cons,
 			$author$project$Main$viewControlArea(model),
-			$author$project$Main$viewCards(model.cardStates)));
+			A2($author$project$Main$viewCards, model.gameMode, model.cardStates)));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
