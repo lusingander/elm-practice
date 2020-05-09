@@ -4,7 +4,7 @@ import Browser
 import Card exposing (Card, allCards, numberEquals, showCard)
 import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Random
 import Random.Extra exposing (combine)
 import Random.List exposing (shuffle)
@@ -61,7 +61,8 @@ type GameMode
 
 
 type alias ShowState =
-    { rotateDeg : Int
+    { mouseOvered : Bool
+    , rotateDeg : Int
     , positionX : Int
     , positionY : Int
     }
@@ -83,7 +84,7 @@ initCardState c =
 
 initShowState : ShowState
 initShowState =
-    ShowState 0 0 0
+    ShowState False 0 0 0
 
 
 resetCardStates : List CardState -> List CardState
@@ -218,6 +219,8 @@ faceDownAllTempFaceUpCards cardStates =
 type Msg
     = New (List CardState)
     | Open CardState
+    | MouseEnter CardState
+    | MouseLeave CardState
     | Shuffle GameMode
 
 
@@ -238,6 +241,16 @@ update msg model =
             , Cmd.none
             )
 
+        MouseEnter cardState ->
+            ( { model | cardStates = mouseEnterToCard cardState <| .cardStates model }
+            , Cmd.none
+            )
+
+        MouseLeave cardState ->
+            ( { model | cardStates = mouseLeaveFromCard cardState <| .cardStates model }
+            , Cmd.none
+            )
+
         Shuffle gm ->
             ( { model
                 | gameMode = gm
@@ -252,13 +265,13 @@ randomCardStates cs =
 
 
 randomCardState : CardState -> Random.Generator CardState
-randomCardState (CardState c f _) =
-    Random.map (CardState c f) randomShowState
+randomCardState (CardState c f s) =
+    Random.map (CardState c f) (randomShowState <| .mouseOvered s)
 
 
-randomShowState : Random.Generator ShowState
-randomShowState =
-    Random.map3 ShowState randomDegree randomPosition randomPosition
+randomShowState : Bool -> Random.Generator ShowState
+randomShowState mouseOvered =
+    Random.map3 (ShowState mouseOvered) randomDegree randomPosition randomPosition
 
 
 randomDegree : Random.Generator Int
@@ -269,6 +282,36 @@ randomDegree =
 randomPosition : Random.Generator Int
 randomPosition =
     Random.int 0 300
+
+
+mouseEnterToCard : CardState -> List CardState -> List CardState
+mouseEnterToCard s cs =
+    updateMouserOveredState True s cs
+
+
+mouseLeaveFromCard : CardState -> List CardState -> List CardState
+mouseLeaveFromCard s cs =
+    updateMouserOveredState False s cs
+
+
+updateMouserOveredState : Bool -> CardState -> List CardState -> List CardState
+updateMouserOveredState mouseOvered originalCardState cardStates =
+    case cardStates of
+        [] ->
+            []
+
+        x :: xs ->
+            (if originalCardState == x then
+                let
+                    (CardState c f s) =
+                        originalCardState
+                in
+                CardState c f { s | mouseOvered = mouseOvered }
+
+             else
+                x
+            )
+                :: updateMouserOveredState mouseOvered originalCardState xs
 
 
 subscriptions : Model -> Sub Msg
@@ -307,8 +350,9 @@ viewCards gm ss =
 viewCard : GameMode -> CardState -> Html Msg
 viewCard gm s =
     span
-        (onClick
-            (Open s)
+        (onClick (Open s)
+            :: onMouseEnter (MouseEnter s)
+            :: onMouseLeave (MouseLeave s)
             :: cardStyle gm s
         )
         [ text (showCardState s) ]
@@ -324,6 +368,12 @@ cardStyle gm (CardState _ f s) =
 
             else if f == FaceDown then
                 [ style "cursor" "pointer" ]
+
+            else
+                []
+           )
+        ++ (if .mouseOvered s && f == FaceDown then
+                [ style "color" "skyblue" ]
 
             else
                 []
