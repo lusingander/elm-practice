@@ -151,7 +151,7 @@ ballHitBar ball bar =
 
 
 view : Computer -> Memory -> List Shape
-view computer memory =
+view _ memory =
     let
         bar =
             .bar memory
@@ -159,10 +159,25 @@ view computer memory =
         ball =
             .ball memory
     in
-    [ rectangle darkGray fieldWidth fieldHeight
-    , showBar bar
-    , showBall ball
-    ]
+    List.concat
+        [ [ rectangle darkGray fieldWidth fieldHeight
+          , showBar bar
+          , showBall ball
+          ]
+        , showGameMessage memory
+        ]
+
+
+showGameMessage : Memory -> List Shape
+showGameMessage memory =
+    case .playingState memory of
+        GameOver ->
+            [ words black "GAME OVER" |> scale 2 |> move 0 30
+            , words black "Press SPACE to restart" |> move 0 -30
+            ]
+
+        _ ->
+            []
 
 
 showBar : Bar -> Shape
