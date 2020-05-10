@@ -50,6 +50,13 @@ type alias Block =
     }
 
 
+type BallHit
+    = HitSideEdge
+    | HitTopEdge
+    | HitBlock
+    | HitBar
+
+
 fieldWidth : Float
 fieldWidth =
     800
@@ -345,12 +352,23 @@ update computer memory =
             let
                 newBall =
                     moveBall memory
+
+                newBlocks =
+                    .blocks memory |> breakBlock newBall
+
+                brokenBlock =
+                    List.length (.blocks memory) /= List.length newBlocks
             in
             { memory
                 | playingState = getPlayingState newBall
                 , bar = .bar memory |> moveBar (5 * toX computer.keyboard)
-                , ball = newBall
-                , blocks = .blocks memory |> breakBlock newBall
+                , ball =
+                    if brokenBlock then
+                        updateBallDirection HitBlock newBall
+
+                    else
+                        newBall
+                , blocks = newBlocks
             }
 
         GameOver ->
@@ -407,10 +425,10 @@ moveBall memory =
                     }
             in
             if ballHitFieldLeftEdge newBall then
-                { newBall | dir = UpRight }
+                updateBallDirection HitSideEdge newBall
 
             else if ballHitFieldTopEdge newBall then
-                { newBall | dir = DownLeft }
+                updateBallDirection HitTopEdge newBall
 
             else
                 newBall
@@ -424,10 +442,10 @@ moveBall memory =
                     }
             in
             if ballHitFieldRightEdge newBall then
-                { newBall | dir = UpLeft }
+                updateBallDirection HitSideEdge newBall
 
             else if ballHitFieldTopEdge newBall then
-                { newBall | dir = DownRight }
+                updateBallDirection HitTopEdge newBall
 
             else
                 newBall
@@ -441,10 +459,10 @@ moveBall memory =
                     }
             in
             if ballHitBar newBall bar then
-                { newBall | dir = UpLeft }
+                updateBallDirection HitBar newBall
 
             else if ballHitFieldLeftEdge newBall then
-                { newBall | dir = DownRight }
+                updateBallDirection HitSideEdge newBall
 
             else
                 newBall
@@ -458,13 +476,67 @@ moveBall memory =
                     }
             in
             if ballHitBar newBall bar then
-                { newBall | dir = UpRight }
+                updateBallDirection HitBar newBall
 
             else if ballHitFieldRightEdge newBall then
-                { newBall | dir = DownLeft }
+                updateBallDirection HitSideEdge newBall
 
             else
                 newBall
+
+
+updateBallDirection : BallHit -> Ball -> Ball
+updateBallDirection hit ball =
+    case hit of
+        HitSideEdge ->
+            case .dir ball of
+                UpLeft ->
+                    { ball | dir = UpRight }
+
+                UpRight ->
+                    { ball | dir = UpLeft }
+
+                DownLeft ->
+                    { ball | dir = DownRight }
+
+                DownRight ->
+                    { ball | dir = DownLeft }
+
+        HitTopEdge ->
+            case .dir ball of
+                UpLeft ->
+                    { ball | dir = DownLeft }
+
+                UpRight ->
+                    { ball | dir = DownRight }
+
+                _ ->
+                    ball
+
+        HitBar ->
+            case .dir ball of
+                DownLeft ->
+                    { ball | dir = UpLeft }
+
+                DownRight ->
+                    { ball | dir = UpRight }
+
+                _ ->
+                    ball
+
+        HitBlock ->
+            case .dir ball of
+                UpLeft ->
+                    { ball | dir = DownLeft }
+
+                UpRight ->
+                    { ball | dir = DownRight }
+
+                DownLeft ->
+                    { ball | dir = UpLeft }
+
+                DownRight ->
+                    { ball | dir = UpRight }
 
 
 getPlayingState : Ball -> PlayingState
