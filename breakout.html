@@ -6723,17 +6723,18 @@ var $evancz$elm_playground$Playground$game = F3(
 		return $elm$browser$Browser$document(
 			{init: init, subscriptions: subscriptions, update: update, view: view});
 	});
+var $author$project$Main$Initial = {$: 'Initial'};
 var $author$project$Main$Memory = F4(
 	function (playingState, bar, ball, blocks) {
 		return {ball: ball, bar: bar, blocks: blocks, playingState: playingState};
 	});
-var $author$project$Main$Playing = {$: 'Playing'};
-var $author$project$Main$Ball = F3(
-	function (x, y, dir) {
-		return {dir: dir, x: x, y: y};
+var $author$project$Main$Ball = F4(
+	function (x, y, dir, dirAngle) {
+		return {dir: dir, dirAngle: dirAngle, x: x, y: y};
 	});
+var $author$project$Main$DicrectionAngle45 = {$: 'DicrectionAngle45'};
 var $author$project$Main$DownRight = {$: 'DownRight'};
-var $author$project$Main$initBall = A3($author$project$Main$Ball, 0, 0, $author$project$Main$DownRight);
+var $author$project$Main$initBall = A4($author$project$Main$Ball, 0, 0, $author$project$Main$DownRight, $author$project$Main$DicrectionAngle45);
 var $author$project$Main$Bar = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
@@ -6775,7 +6776,7 @@ var $author$project$Main$createBlocks = F4(
 		}
 	});
 var $author$project$Main$initBlocks = A4($author$project$Main$createBlocks, 6, 0, (-($author$project$Main$fieldWidth / 2)) + $author$project$Main$blockMargin, ($author$project$Main$fieldHeight / 2) - $author$project$Main$blockMargin);
-var $author$project$Main$initMemory = A4($author$project$Main$Memory, $author$project$Main$Playing, $author$project$Main$initBar, $author$project$Main$initBall, $author$project$Main$initBlocks);
+var $author$project$Main$initMemory = A4($author$project$Main$Memory, $author$project$Main$Initial, $author$project$Main$initBar, $author$project$Main$initBall, $author$project$Main$initBlocks);
 var $author$project$Main$HitBlock = {$: 'HitBlock'};
 var $author$project$Main$ballRadius = 10;
 var $author$project$Main$blockBottom = function (block) {
@@ -6841,6 +6842,7 @@ var $author$project$Main$breakBlock = F2(
 		}
 	});
 var $author$project$Main$GameOver = {$: 'GameOver'};
+var $author$project$Main$Playing = {$: 'Playing'};
 var $author$project$Main$ballBottom = function (ball) {
 	return function ($) {
 		return $.y;
@@ -6854,9 +6856,14 @@ var $author$project$Main$ballHitFieldBottomEdge = function (ball) {
 var $author$project$Main$getPlayingState = function (ball) {
 	return $author$project$Main$ballHitFieldBottomEdge(ball) ? $author$project$Main$GameOver : $author$project$Main$Playing;
 };
-var $author$project$Main$HitBar = {$: 'HitBar'};
+var $author$project$Main$Center = {$: 'Center'};
+var $author$project$Main$HitBar = function (a) {
+	return {$: 'HitBar', a: a};
+};
 var $author$project$Main$HitSideEdge = {$: 'HitSideEdge'};
 var $author$project$Main$HitTopEdge = {$: 'HitTopEdge'};
+var $author$project$Main$Left = {$: 'Left'};
+var $author$project$Main$Right = {$: 'Right'};
 var $author$project$Main$barLeft = function (bar) {
 	return function ($) {
 		return $.x;
@@ -6876,6 +6883,34 @@ var $author$project$Main$ballHitBar = F2(
 	function (ball, bar) {
 		return (_Utils_cmp(
 			$author$project$Main$barLeft(bar),
+			function ($) {
+				return $.x;
+			}(ball)) < 1) && ((_Utils_cmp(
+			function ($) {
+				return $.x;
+			}(ball),
+			$author$project$Main$barRight(bar)) < 1) && (_Utils_cmp(
+			$author$project$Main$ballBottom(ball),
+			$author$project$Main$barTop(bar)) < 1));
+	});
+var $author$project$Main$ballHitBarLeft = F2(
+	function (ball, bar) {
+		return (_Utils_cmp(
+			$author$project$Main$barLeft(bar),
+			function ($) {
+				return $.x;
+			}(ball)) < 1) && ((_Utils_cmp(
+			function ($) {
+				return $.x;
+			}(ball),
+			$author$project$Main$barLeft(bar) + ($author$project$Main$barWidth / 3)) < 1) && (_Utils_cmp(
+			$author$project$Main$ballBottom(ball),
+			$author$project$Main$barTop(bar)) < 1));
+	});
+var $author$project$Main$ballHitBarRight = F2(
+	function (ball, bar) {
+		return (_Utils_cmp(
+			$author$project$Main$barRight(bar) - ($author$project$Main$barWidth / 3),
 			function ($) {
 				return $.x;
 			}(ball)) < 1) && ((_Utils_cmp(
@@ -6916,7 +6951,28 @@ var $author$project$Main$ballHitFieldTopEdge = function (ball) {
 		$author$project$Main$fieldHeight / 2,
 		$author$project$Main$ballTop(ball)) < 1;
 };
-var $author$project$Main$moveBallDelta = 3;
+var $author$project$Main$moveBallDelta = 5;
+var $author$project$Main$moveBallDeltaX = function (angle) {
+	switch (angle.$) {
+		case 'DicrectionAngle30':
+			return ($author$project$Main$moveBallDelta * 2) / 1.732;
+		case 'DicrectionAngle45':
+			return $author$project$Main$moveBallDelta / 1.414;
+		default:
+			return $author$project$Main$moveBallDelta / 2;
+	}
+};
+var $author$project$Main$moveBallDeltaY = function (angle) {
+	switch (angle.$) {
+		case 'DicrectionAngle30':
+			return $author$project$Main$moveBallDelta / 2;
+		case 'DicrectionAngle45':
+			return $author$project$Main$moveBallDelta / 1.414;
+		default:
+			return ($author$project$Main$moveBallDelta * 2) / 1.732;
+	}
+};
+var $author$project$Main$DicrectionAngle30 = {$: 'DicrectionAngle30'};
 var $author$project$Main$DownLeft = {$: 'DownLeft'};
 var $author$project$Main$UpLeft = {$: 'UpLeft'};
 var $author$project$Main$UpRight = {$: 'UpRight'};
@@ -6962,26 +7018,49 @@ var $author$project$Main$updateBallDirection = F2(
 						return ball;
 				}
 			case 'HitBar':
+				var pos = hit.a;
 				var _v3 = function ($) {
 					return $.dir;
 				}(ball);
 				switch (_v3.$) {
 					case 'DownLeft':
-						return _Utils_update(
-							ball,
-							{dir: $author$project$Main$UpLeft});
+						switch (pos.$) {
+							case 'Right':
+								return _Utils_update(
+									ball,
+									{dir: $author$project$Main$UpRight});
+							case 'Left':
+								return _Utils_update(
+									ball,
+									{dir: $author$project$Main$UpLeft, dirAngle: $author$project$Main$DicrectionAngle30});
+							default:
+								return _Utils_update(
+									ball,
+									{dir: $author$project$Main$UpLeft, dirAngle: $author$project$Main$DicrectionAngle45});
+						}
 					case 'DownRight':
-						return _Utils_update(
-							ball,
-							{dir: $author$project$Main$UpRight});
+						switch (pos.$) {
+							case 'Left':
+								return _Utils_update(
+									ball,
+									{dir: $author$project$Main$UpLeft});
+							case 'Right':
+								return _Utils_update(
+									ball,
+									{dir: $author$project$Main$UpRight, dirAngle: $author$project$Main$DicrectionAngle30});
+							default:
+								return _Utils_update(
+									ball,
+									{dir: $author$project$Main$UpRight, dirAngle: $author$project$Main$DicrectionAngle45});
+						}
 					default:
 						return ball;
 				}
 			default:
-				var _v4 = function ($) {
+				var _v6 = function ($) {
 					return $.dir;
 				}(ball);
-				switch (_v4.$) {
+				switch (_v6.$) {
 					case 'UpLeft':
 						return _Utils_update(
 							ball,
@@ -7002,13 +7081,20 @@ var $author$project$Main$updateBallDirection = F2(
 		}
 	});
 var $author$project$Main$moveBall = function (memory) {
-	var d = $author$project$Main$moveBallDelta;
 	var bar = function ($) {
 		return $.bar;
 	}(memory);
 	var ball = function ($) {
 		return $.ball;
 	}(memory);
+	var dx = $author$project$Main$moveBallDeltaX(
+		function ($) {
+			return $.dirAngle;
+		}(ball));
+	var dy = $author$project$Main$moveBallDeltaY(
+		function ($) {
+			return $.dirAngle;
+		}(ball));
 	var oldX = function ($) {
 		return $.x;
 	}(ball);
@@ -7022,23 +7108,41 @@ var $author$project$Main$moveBall = function (memory) {
 		case 'UpLeft':
 			var newBall = _Utils_update(
 				ball,
-				{x: oldX - d, y: oldY + d});
+				{x: oldX - dx, y: oldY + dy});
 			return $author$project$Main$ballHitFieldLeftEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitSideEdge, newBall) : ($author$project$Main$ballHitFieldTopEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitTopEdge, newBall) : newBall);
 		case 'UpRight':
 			var newBall = _Utils_update(
 				ball,
-				{x: oldX + d, y: oldY + d});
+				{x: oldX + dx, y: oldY + dy});
 			return $author$project$Main$ballHitFieldRightEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitSideEdge, newBall) : ($author$project$Main$ballHitFieldTopEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitTopEdge, newBall) : newBall);
 		case 'DownLeft':
 			var newBall = _Utils_update(
 				ball,
-				{x: oldX - d, y: oldY - d});
-			return A2($author$project$Main$ballHitBar, newBall, bar) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitBar, newBall) : ($author$project$Main$ballHitFieldLeftEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitSideEdge, newBall) : newBall);
+				{x: oldX - dx, y: oldY - dy});
+			return A2($author$project$Main$ballHitBar, newBall, bar) ? (A2($author$project$Main$ballHitBarLeft, newBall, bar) ? A2(
+				$author$project$Main$updateBallDirection,
+				$author$project$Main$HitBar($author$project$Main$Left),
+				newBall) : (A2($author$project$Main$ballHitBarRight, newBall, bar) ? A2(
+				$author$project$Main$updateBallDirection,
+				$author$project$Main$HitBar($author$project$Main$Right),
+				newBall) : A2(
+				$author$project$Main$updateBallDirection,
+				$author$project$Main$HitBar($author$project$Main$Center),
+				newBall))) : ($author$project$Main$ballHitFieldLeftEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitSideEdge, newBall) : newBall);
 		default:
 			var newBall = _Utils_update(
 				ball,
-				{x: oldX + d, y: oldY - d});
-			return A2($author$project$Main$ballHitBar, newBall, bar) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitBar, newBall) : ($author$project$Main$ballHitFieldRightEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitSideEdge, newBall) : newBall);
+				{x: oldX + dx, y: oldY - dy});
+			return A2($author$project$Main$ballHitBar, newBall, bar) ? (A2($author$project$Main$ballHitBarLeft, newBall, bar) ? A2(
+				$author$project$Main$updateBallDirection,
+				$author$project$Main$HitBar($author$project$Main$Left),
+				newBall) : (A2($author$project$Main$ballHitBarRight, newBall, bar) ? A2(
+				$author$project$Main$updateBallDirection,
+				$author$project$Main$HitBar($author$project$Main$Right),
+				newBall) : A2(
+				$author$project$Main$updateBallDirection,
+				$author$project$Main$HitBar($author$project$Main$Center),
+				newBall))) : ($author$project$Main$ballHitFieldRightEdge(newBall) ? A2($author$project$Main$updateBallDirection, $author$project$Main$HitSideEdge, newBall) : newBall);
 	}
 };
 var $author$project$Main$barIsInField = function (bar) {
@@ -7061,6 +7165,11 @@ var $author$project$Main$moveBar = F2(
 		return $author$project$Main$barIsInField(newBar) ? newBar : bar;
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$startGame = function (memory) {
+	return _Utils_update(
+		memory,
+		{playingState: $author$project$Main$Playing});
+};
 var $evancz$elm_playground$Playground$toX = function (keyboard) {
 	return (keyboard.right ? 1 : 0) - (keyboard.left ? 1 : 0);
 };
@@ -7097,7 +7206,7 @@ var $author$project$Main$update = F2(
 					playingState: $author$project$Main$getPlayingState(newBall)
 				});
 		} else {
-			return computer.keyboard.space ? $author$project$Main$initMemory : memory;
+			return computer.keyboard.space ? $author$project$Main$startGame($author$project$Main$initMemory) : memory;
 		}
 	});
 var $evancz$elm_playground$Playground$Hex = function (a) {
@@ -7233,25 +7342,35 @@ var $author$project$Main$showGameMessage = function (memory) {
 	var _v0 = function ($) {
 		return $.playingState;
 	}(memory);
-	if (_v0.$ === 'GameOver') {
-		return _List_fromArray(
-			[
-				A3(
-				$evancz$elm_playground$Playground$move,
-				0,
-				30,
-				A2(
-					$evancz$elm_playground$Playground$scale,
-					2,
-					A2($evancz$elm_playground$Playground$words, $evancz$elm_playground$Playground$black, 'GAME OVER'))),
-				A3(
-				$evancz$elm_playground$Playground$move,
-				0,
-				-30,
-				A2($evancz$elm_playground$Playground$words, $evancz$elm_playground$Playground$black, 'Press SPACE to restart'))
-			]);
-	} else {
-		return _List_Nil;
+	switch (_v0.$) {
+		case 'Initial':
+			return _List_fromArray(
+				[
+					A3(
+					$evancz$elm_playground$Playground$move,
+					0,
+					-30,
+					A2($evancz$elm_playground$Playground$words, $evancz$elm_playground$Playground$black, 'Press SPACE to start'))
+				]);
+		case 'GameOver':
+			return _List_fromArray(
+				[
+					A3(
+					$evancz$elm_playground$Playground$move,
+					0,
+					30,
+					A2(
+						$evancz$elm_playground$Playground$scale,
+						2,
+						A2($evancz$elm_playground$Playground$words, $evancz$elm_playground$Playground$black, 'GAME OVER'))),
+					A3(
+					$evancz$elm_playground$Playground$move,
+					0,
+					-30,
+					A2($evancz$elm_playground$Playground$words, $evancz$elm_playground$Playground$black, 'Press SPACE to restart'))
+				]);
+		default:
+			return _List_Nil;
 	}
 };
 var $author$project$Main$view = F2(
