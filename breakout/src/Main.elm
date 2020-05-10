@@ -86,6 +86,11 @@ barRight bar =
     .x bar + (barWidth / 2)
 
 
+barTop : Bar -> Float
+barTop bar =
+    .y bar + (barHeight / 2)
+
+
 barIsInField : Bar -> Bool
 barIsInField bar =
     let
@@ -135,6 +140,11 @@ ballHitFieldBottomEdge ball =
     ballBottom ball <= -(fieldHeight / 2)
 
 
+ballHitBar : Ball -> Bar -> Bool
+ballHitBar ball bar =
+    barLeft bar <= .x ball && .x ball <= barRight bar && ballBottom ball <= barTop bar
+
+
 view : Computer -> Memory -> List Shape
 view computer memory =
     let
@@ -166,7 +176,7 @@ update : Computer -> Memory -> Memory
 update computer memory =
     { memory
         | bar = .bar memory |> moveBar (5 * toX computer.keyboard)
-        , ball = .ball memory |> moveBall
+        , ball = moveBall memory
     }
 
 
@@ -188,9 +198,15 @@ moveBallDelta =
     3
 
 
-moveBall : Ball -> Ball
-moveBall ball =
+moveBall : Memory -> Ball
+moveBall memory =
     let
+        bar =
+            .bar memory
+
+        ball =
+            .ball memory
+
         oldX =
             .x ball
 
@@ -243,7 +259,10 @@ moveBall ball =
                         , y = oldY - d
                     }
             in
-            if ballHitFieldLeftEdge newBall then
+            if ballHitBar newBall bar then
+                { newBall | dir = UpLeft }
+
+            else if ballHitFieldLeftEdge newBall then
                 { newBall | dir = DownRight }
 
             else if ballHitFieldBottomEdge newBall then
@@ -260,7 +279,10 @@ moveBall ball =
                         , y = oldY - d
                     }
             in
-            if ballHitFieldRightEdge newBall then
+            if ballHitBar newBall bar then
+                { newBall | dir = UpRight }
+
+            else if ballHitFieldRightEdge newBall then
                 { newBall | dir = DownLeft }
 
             else if ballHitFieldBottomEdge newBall then
