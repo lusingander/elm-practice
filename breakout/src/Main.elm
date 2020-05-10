@@ -192,7 +192,11 @@ update computer memory =
             }
 
         GameOver ->
-            memory
+            if computer.keyboard.space then
+                initMemory
+
+            else
+                memory
 
 
 moveBar : Float -> Bar -> Bar
