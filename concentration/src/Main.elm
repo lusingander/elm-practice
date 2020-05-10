@@ -99,11 +99,7 @@ cardFromState (CardState c _ _) =
 
 lastOpenedNumberIsEqualTo : Card -> GameState -> Bool
 lastOpenedNumberIsEqualTo c gameState =
-    let
-        lastOpened =
-            .lastOpened gameState
-    in
-    case lastOpened of
+    case .lastOpened gameState of
         Just n ->
             numberEquals c n
 
