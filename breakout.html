@@ -6972,10 +6972,31 @@ var $author$project$Main$moveBallDeltaY = function (angle) {
 			return ($author$project$Main$moveBallDelta * 2) / 1.732;
 	}
 };
-var $author$project$Main$DicrectionAngle30 = {$: 'DicrectionAngle30'};
 var $author$project$Main$DownLeft = {$: 'DownLeft'};
 var $author$project$Main$UpLeft = {$: 'UpLeft'};
 var $author$project$Main$UpRight = {$: 'UpRight'};
+var $author$project$Main$DicrectionAngle60 = {$: 'DicrectionAngle60'};
+var $author$project$Main$gentleAngle = function (angle) {
+	switch (angle.$) {
+		case 'DicrectionAngle30':
+			return $author$project$Main$DicrectionAngle45;
+		case 'DicrectionAngle45':
+			return $author$project$Main$DicrectionAngle60;
+		default:
+			return $author$project$Main$DicrectionAngle60;
+	}
+};
+var $author$project$Main$DicrectionAngle30 = {$: 'DicrectionAngle30'};
+var $author$project$Main$sharpAngle = function (angle) {
+	switch (angle.$) {
+		case 'DicrectionAngle30':
+			return $author$project$Main$DicrectionAngle30;
+		case 'DicrectionAngle45':
+			return $author$project$Main$DicrectionAngle30;
+		default:
+			return $author$project$Main$DicrectionAngle45;
+	}
+};
 var $author$project$Main$updateBallDirection = F2(
 	function (hit, ball) {
 		switch (hit.$) {
@@ -7028,30 +7049,54 @@ var $author$project$Main$updateBallDirection = F2(
 							case 'Right':
 								return _Utils_update(
 									ball,
-									{dir: $author$project$Main$UpRight});
+									{
+										dir: $author$project$Main$UpRight,
+										dirAngle: $author$project$Main$gentleAngle(
+											function ($) {
+												return $.dirAngle;
+											}(ball))
+									});
 							case 'Left':
 								return _Utils_update(
 									ball,
-									{dir: $author$project$Main$UpLeft, dirAngle: $author$project$Main$DicrectionAngle30});
+									{
+										dir: $author$project$Main$UpLeft,
+										dirAngle: $author$project$Main$sharpAngle(
+											function ($) {
+												return $.dirAngle;
+											}(ball))
+									});
 							default:
 								return _Utils_update(
 									ball,
-									{dir: $author$project$Main$UpLeft, dirAngle: $author$project$Main$DicrectionAngle45});
+									{dir: $author$project$Main$UpLeft});
 						}
 					case 'DownRight':
 						switch (pos.$) {
 							case 'Left':
 								return _Utils_update(
 									ball,
-									{dir: $author$project$Main$UpLeft});
+									{
+										dir: $author$project$Main$UpLeft,
+										dirAngle: $author$project$Main$gentleAngle(
+											function ($) {
+												return $.dirAngle;
+											}(ball))
+									});
 							case 'Right':
 								return _Utils_update(
 									ball,
-									{dir: $author$project$Main$UpRight, dirAngle: $author$project$Main$DicrectionAngle30});
+									{
+										dir: $author$project$Main$UpRight,
+										dirAngle: $author$project$Main$sharpAngle(
+											function ($) {
+												return $.dirAngle;
+											}(ball))
+									});
 							default:
 								return _Utils_update(
 									ball,
-									{dir: $author$project$Main$UpRight, dirAngle: $author$project$Main$DicrectionAngle45});
+									{dir: $author$project$Main$UpRight});
 						}
 					default:
 						return ball;
