@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Card exposing (Card, allCards, numberEquals, showCard)
+import Card exposing (Card, allCards, numberEquals, showCard, showCardBack)
 import Html exposing (Html, button, div, span, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
@@ -396,8 +396,8 @@ transformStyleString d x y =
 showCardState : CardState -> String
 showCardState s =
     case s of
-        CardState c FaceDown _ ->
-            showCard False c
+        CardState _ FaceDown _ ->
+            showCardBack
 
         CardState c _ _ ->
-            showCard True c
+            showCard c

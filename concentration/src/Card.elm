@@ -1,4 +1,4 @@
-module Card exposing (Card, allCards, numberEquals, showCard)
+module Card exposing (Card, allCards, numberEquals, showCard, showCardBack)
 
 
 type Card
@@ -145,168 +145,169 @@ numberEquals c1 c2 =
     cardNumber c1 == cardNumber c2
 
 
-showCard : Bool -> Card -> String
-showCard open c =
-    if not open then
-        "🂠"
+showCardBack : String
+showCardBack =
+    "🂠"
 
-    else
-        case c of
-            Card Spades Ace ->
-                "🂡"
 
-            Card Spades Two ->
-                "🂢"
+showCard : Card -> String
+showCard c =
+    case c of
+        Card Spades Ace ->
+            "🂡"
 
-            Card Spades Three ->
-                "🂣"
+        Card Spades Two ->
+            "🂢"
 
-            Card Spades Four ->
-                "🂤"
+        Card Spades Three ->
+            "🂣"
 
-            Card Spades Five ->
-                "🂥"
+        Card Spades Four ->
+            "🂤"
 
-            Card Spades Six ->
-                "🂦"
+        Card Spades Five ->
+            "🂥"
 
-            Card Spades Seven ->
-                "🂧"
+        Card Spades Six ->
+            "🂦"
 
-            Card Spades Eight ->
-                "🂨"
+        Card Spades Seven ->
+            "🂧"
 
-            Card Spades Nine ->
-                "🂩"
+        Card Spades Eight ->
+            "🂨"
 
-            Card Spades Ten ->
-                "🂪"
+        Card Spades Nine ->
+            "🂩"
 
-            Card Spades Jack ->
-                "🂫"
+        Card Spades Ten ->
+            "🂪"
 
-            Card Spades Queen ->
-                "🂭"
+        Card Spades Jack ->
+            "🂫"
 
-            Card Spades King ->
-                "🂮"
+        Card Spades Queen ->
+            "🂭"
 
-            Card Hearts Ace ->
-                "🂱"
+        Card Spades King ->
+            "🂮"
 
-            Card Hearts Two ->
-                "🂲"
+        Card Hearts Ace ->
+            "🂱"
 
-            Card Hearts Three ->
-                "🂳"
+        Card Hearts Two ->
+            "🂲"
 
-            Card Hearts Four ->
-                "🂴"
+        Card Hearts Three ->
+            "🂳"
 
-            Card Hearts Five ->
-                "🂵"
+        Card Hearts Four ->
+            "🂴"
 
-            Card Hearts Six ->
-                "🂶"
+        Card Hearts Five ->
+            "🂵"
 
-            Card Hearts Seven ->
-                "🂷"
+        Card Hearts Six ->
+            "🂶"
 
-            Card Hearts Eight ->
-                "🂸"
+        Card Hearts Seven ->
+            "🂷"
 
-            Card Hearts Nine ->
-                "🂹"
+        Card Hearts Eight ->
+            "🂸"
 
-            Card Hearts Ten ->
-                "🂺"
+        Card Hearts Nine ->
+            "🂹"
 
-            Card Hearts Jack ->
-                "🂻"
+        Card Hearts Ten ->
+            "🂺"
 
-            Card Hearts Queen ->
-                "🂽"
+        Card Hearts Jack ->
+            "🂻"
 
-            Card Hearts King ->
-                "🂾"
+        Card Hearts Queen ->
+            "🂽"
 
-            Card Diamonds Ace ->
-                "🃁"
+        Card Hearts King ->
+            "🂾"
 
-            Card Diamonds Two ->
-                "🃂"
+        Card Diamonds Ace ->
+            "🃁"
 
-            Card Diamonds Three ->
-                "🃃"
+        Card Diamonds Two ->
+            "🃂"
 
-            Card Diamonds Four ->
-                "🃄"
+        Card Diamonds Three ->
+            "🃃"
 
-            Card Diamonds Five ->
-                "🃅"
+        Card Diamonds Four ->
+            "🃄"
 
-            Card Diamonds Six ->
-                "🃆"
+        Card Diamonds Five ->
+            "🃅"
 
-            Card Diamonds Seven ->
-                "🃇"
+        Card Diamonds Six ->
+            "🃆"
 
-            Card Diamonds Eight ->
-                "🃈"
+        Card Diamonds Seven ->
+            "🃇"
 
-            Card Diamonds Nine ->
-                "🃉"
+        Card Diamonds Eight ->
+            "🃈"
 
-            Card Diamonds Ten ->
-                "🃊"
+        Card Diamonds Nine ->
+            "🃉"
 
-            Card Diamonds Jack ->
-                "🃋"
+        Card Diamonds Ten ->
+            "🃊"
 
-            Card Diamonds Queen ->
-                "🃍"
+        Card Diamonds Jack ->
+            "🃋"
 
-            Card Diamonds King ->
-                "🃎"
+        Card Diamonds Queen ->
+            "🃍"
 
-            Card Clubs Ace ->
-                "🃑"
+        Card Diamonds King ->
+            "🃎"
 
-            Card Clubs Two ->
-                "🃒"
+        Card Clubs Ace ->
+            "🃑"
 
-            Card Clubs Three ->
-                "🃓"
+        Card Clubs Two ->
+            "🃒"
 
-            Card Clubs Four ->
-                "🃔"
+        Card Clubs Three ->
+            "🃓"
 
-            Card Clubs Five ->
-                "🃕"
+        Card Clubs Four ->
+            "🃔"
 
-            Card Clubs Six ->
-                "🃖"
+        Card Clubs Five ->
+            "🃕"
 
-            Card Clubs Seven ->
-                "🃗"
+        Card Clubs Six ->
+            "🃖"
 
-            Card Clubs Eight ->
-                "🃘"
+        Card Clubs Seven ->
+            "🃗"
 
-            Card Clubs Nine ->
-                "🃙"
+        Card Clubs Eight ->
+            "🃘"
 
-            Card Clubs Ten ->
-                "🃚"
+        Card Clubs Nine ->
+            "🃙"
 
-            Card Clubs Jack ->
-                "🃛"
+        Card Clubs Ten ->
+            "🃚"
 
-            Card Clubs Queen ->
-                "🃝"
+        Card Clubs Jack ->
+            "🃛"
 
-            Card Clubs King ->
-                "🃞"
+        Card Clubs Queen ->
+            "🃝"
 
-            Joker ->
-                "🃟"
+        Card Clubs King ->
+            "🃞"
+
+        Joker ->
+            "🃟"
