@@ -271,7 +271,7 @@ randomCardState (CardState c f s) =
 
 randomShowState : Bool -> Random.Generator ShowState
 randomShowState mouseOvered =
-    Random.map3 (ShowState mouseOvered) randomDegree randomPosition randomPosition
+    Random.map3 (ShowState mouseOvered) randomDegree (randomPosition 30) (randomPosition 100)
 
 
 randomDegree : Random.Generator Int
@@ -279,9 +279,9 @@ randomDegree =
     Random.int 0 359
 
 
-randomPosition : Random.Generator Int
-randomPosition =
-    Random.int 0 300
+randomPosition : Int -> Random.Generator Int
+randomPosition max =
+    Random.int 0 max
 
 
 mouseEnterToCard : CardState -> List CardState -> List CardState
