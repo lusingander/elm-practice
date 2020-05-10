@@ -300,14 +300,12 @@ view _ memory =
         blocks =
             .blocks memory
     in
-    List.concat
-        [ [ rectangle darkGray fieldWidth fieldHeight
-          , showBar bar
-          , showBall ball
-          ]
-        , showBlocks blocks
-        , showGameMessage memory
-        ]
+    [ rectangle darkGray fieldWidth fieldHeight
+    , showBar bar
+    , showBall ball
+    ]
+        ++ showBlocks blocks
+        ++ showGameMessage memory
 
 
 showGameMessage : Memory -> List Shape
