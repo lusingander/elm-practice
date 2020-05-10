@@ -21,10 +21,33 @@ jobs:
       - name: Make
         run: elm make src/Main.elm
 
+      - name: Rename files
+        run: |
+          mv ./index.html ./concentration.html
+
+      - name: Remove files
+        run: |
+          rm -rf ./src elm.json
+
+      - name: Move files
+        run: |
+          mv ./breakout/src/ ./breakout/elm.json ./
+
+      - name: Make
+        run: elm make src/Main.elm
+
+      - name: Rename files
+        run: |
+          mv ./index.html ./breakout.html
+
+      - name: Remove files
+        run: |
+          rm -rf ./src elm.json
+
       - name: Move files
         run: |
           mkdir ./public
-          mv ./index.html ./public/
+          mv ./concentration.html ./breakout.html ./public/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
