@@ -33,6 +33,7 @@ type alias Ball =
     { x : Float
     , y : Float
     , dir : BallDirection
+    , dirAngle : BallDirectionAngle
     }
 
 
@@ -41,6 +42,12 @@ type BallDirection
     | UpRight
     | DownLeft
     | DownRight
+
+
+type BallDirectionAngle
+    = DicrectionAngle30
+    | DicrectionAngle45
+    | DicrectionAngle60
 
 
 type alias Block =
@@ -55,7 +62,13 @@ type BallHit
     = HitSideEdge
     | HitTopEdge
     | HitBlock
-    | HitBar
+    | HitBar HitBarPosition
+
+
+type HitBarPosition
+    = Left
+    | Right
+    | Center
 
 
 fieldWidth : Float
@@ -115,7 +128,7 @@ initBar =
 
 initBall : Ball
 initBall =
-    Ball 0 0 DownRight
+    Ball 0 0 DownRight DicrectionAngle45
 
 
 initBlocks : List Block
@@ -231,6 +244,21 @@ ballHitFieldBottomEdge ball =
 ballHitBar : Ball -> Bar -> Bool
 ballHitBar ball bar =
     barLeft bar <= .x ball && .x ball <= barRight bar && ballBottom ball <= barTop bar
+
+
+ballHitBarLeft : Ball -> Bar -> Bool
+ballHitBarLeft ball bar =
+    barLeft bar <= .x ball && .x ball <= barLeft bar + (barWidth / 3) && ballBottom ball <= barTop bar
+
+
+ballHitBarRight : Ball -> Bar -> Bool
+ballHitBarRight ball bar =
+    barRight bar - (barWidth / 3) <= .x ball && .x ball <= barRight bar && ballBottom ball <= barTop bar
+
+
+ballHitBarCenter : Ball -> Bar -> Bool
+ballHitBarCenter ball bar =
+    barLeft bar + (barWidth / 3) <= .x ball && .x ball <= barRight bar - (barWidth / 3) && ballBottom ball <= barTop bar
 
 
 ballHitBlock : Ball -> Block -> Bool
@@ -402,7 +430,33 @@ moveBar d bar =
 
 moveBallDelta : Float
 moveBallDelta =
-    3
+    5
+
+
+moveBallDeltaX : BallDirectionAngle -> Float
+moveBallDeltaX angle =
+    case angle of
+        DicrectionAngle30 ->
+            moveBallDelta * 2 / 1.732
+
+        DicrectionAngle45 ->
+            moveBallDelta / 1.414
+
+        DicrectionAngle60 ->
+            moveBallDelta / 2
+
+
+moveBallDeltaY : BallDirectionAngle -> Float
+moveBallDeltaY angle =
+    case angle of
+        DicrectionAngle30 ->
+            moveBallDelta / 2
+
+        DicrectionAngle45 ->
+            moveBallDelta / 1.414
+
+        DicrectionAngle60 ->
+            moveBallDelta * 2 / 1.732
 
 
 moveBall : Memory -> Ball
@@ -420,16 +474,19 @@ moveBall memory =
         oldY =
             .y ball
 
-        d =
-            moveBallDelta
+        dx =
+            moveBallDeltaX <| .dirAngle ball
+
+        dy =
+            moveBallDeltaY <| .dirAngle ball
     in
     case .dir ball of
         UpLeft ->
             let
                 newBall =
                     { ball
-                        | x = oldX - d
-                        , y = oldY + d
+                        | x = oldX - dx
+                        , y = oldY + dy
                     }
             in
             if ballHitFieldLeftEdge newBall then
@@ -445,8 +502,8 @@ moveBall memory =
             let
                 newBall =
                     { ball
-                        | x = oldX + d
-                        , y = oldY + d
+                        | x = oldX + dx
+                        , y = oldY + dy
                     }
             in
             if ballHitFieldRightEdge newBall then
@@ -462,12 +519,20 @@ moveBall memory =
             let
                 newBall =
                     { ball
-                        | x = oldX - d
-                        , y = oldY - d
+                        | x = oldX - dx
+                        , y = oldY - dy
                     }
             in
             if ballHitBar newBall bar then
-                updateBallDirection HitBar newBall
+                if ballHitBarLeft newBall bar then
+                    updateBallDirection (HitBar Left) newBall
+
+                else if ballHitBarRight newBall bar then
+                    updateBallDirection (HitBar Right) newBall
+
+                else
+                    -- if ballHitBarCenter newBall bar then
+                    updateBallDirection (HitBar Center) newBall
 
             else if ballHitFieldLeftEdge newBall then
                 updateBallDirection HitSideEdge newBall
@@ -479,12 +544,20 @@ moveBall memory =
             let
                 newBall =
                     { ball
-                        | x = oldX + d
-                        , y = oldY - d
+                        | x = oldX + dx
+                        , y = oldY - dy
                     }
             in
             if ballHitBar newBall bar then
-                updateBallDirection HitBar newBall
+                if ballHitBarLeft newBall bar then
+                    updateBallDirection (HitBar Left) newBall
+
+                else if ballHitBarRight newBall bar then
+                    updateBallDirection (HitBar Right) newBall
+
+                else
+                    -- if ballHitBarCenter newBall bar then
+                    updateBallDirection (HitBar Center) newBall
 
             else if ballHitFieldRightEdge newBall then
                 updateBallDirection HitSideEdge newBall
@@ -521,13 +594,41 @@ updateBallDirection hit ball =
                 _ ->
                     ball
 
-        HitBar ->
+        HitBar pos ->
             case .dir ball of
                 DownLeft ->
-                    { ball | dir = UpLeft }
+                    case pos of
+                        Right ->
+                            { ball | dir = UpRight }
+
+                        Left ->
+                            { ball
+                                | dir = UpLeft
+                                , dirAngle = DicrectionAngle30
+                            }
+
+                        Center ->
+                            { ball
+                                | dir = UpLeft
+                                , dirAngle = DicrectionAngle45
+                            }
 
                 DownRight ->
-                    { ball | dir = UpRight }
+                    case pos of
+                        Left ->
+                            { ball | dir = UpLeft }
+
+                        Right ->
+                            { ball
+                                | dir = UpRight
+                                , dirAngle = DicrectionAngle30
+                            }
+
+                        Center ->
+                            { ball
+                                | dir = UpRight
+                                , dirAngle = DicrectionAngle45
+                            }
 
                 _ ->
                     ball
