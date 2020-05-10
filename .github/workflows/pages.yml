@@ -27,7 +27,7 @@ jobs:
 
       - name: Remove files
         run: |
-          rm -rf ./src elm.json
+          rm -rf ./src elm.json ./elm-stuff
 
       - name: Move files
         run: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Remove files
         run: |
-          rm -rf ./src elm.json
+          rm -rf ./src elm.json ./elm-stuff
 
       - name: Move files
         run: |
