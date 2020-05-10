@@ -16,7 +16,8 @@ type alias Memory =
 
 
 type PlayingState
-    = Playing
+    = Initial
+    | Playing
     | GameOver
 
 
@@ -99,7 +100,12 @@ blockHeight =
 
 initMemory : Memory
 initMemory =
-    Memory Playing initBar initBall initBlocks
+    Memory Initial initBar initBall initBlocks
+
+
+startGame : Memory -> Memory
+startGame memory =
+    { memory | playingState = Playing }
 
 
 initBar : Bar
@@ -311,6 +317,10 @@ view _ memory =
 showGameMessage : Memory -> List Shape
 showGameMessage memory =
     case .playingState memory of
+        Initial ->
+            [ words black "Press SPACE to start" |> move 0 -30
+            ]
+
         GameOver ->
             [ words black "GAME OVER" |> scale 2 |> move 0 30
             , words black "Press SPACE to restart" |> move 0 -30
@@ -369,9 +379,9 @@ update computer memory =
                 , blocks = newBlocks
             }
 
-        GameOver ->
+        _ ->
             if computer.keyboard.space then
-                initMemory
+                startGame initMemory
 
             else
                 memory
