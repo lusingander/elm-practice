@@ -322,6 +322,32 @@ breakBlock ball blocks =
                 b :: breakBlock ball bs
 
 
+gentleAngle : BallDirectionAngle -> BallDirectionAngle
+gentleAngle angle =
+    case angle of
+        DicrectionAngle30 ->
+            DicrectionAngle45
+
+        DicrectionAngle45 ->
+            DicrectionAngle60
+
+        DicrectionAngle60 ->
+            DicrectionAngle60
+
+
+sharpAngle : BallDirectionAngle -> BallDirectionAngle
+sharpAngle angle =
+    case angle of
+        DicrectionAngle30 ->
+            DicrectionAngle30
+
+        DicrectionAngle45 ->
+            DicrectionAngle30
+
+        DicrectionAngle60 ->
+            DicrectionAngle45
+
+
 view : Computer -> Memory -> List Shape
 view _ memory =
     let
@@ -599,36 +625,36 @@ updateBallDirection hit ball =
                 DownLeft ->
                     case pos of
                         Right ->
-                            { ball | dir = UpRight }
+                            { ball
+                                | dir = UpRight
+                                , dirAngle = gentleAngle <| .dirAngle ball
+                            }
 
                         Left ->
                             { ball
                                 | dir = UpLeft
-                                , dirAngle = DicrectionAngle30
+                                , dirAngle = sharpAngle <| .dirAngle ball
                             }
 
                         Center ->
-                            { ball
-                                | dir = UpLeft
-                                , dirAngle = DicrectionAngle45
-                            }
+                            { ball | dir = UpLeft }
 
                 DownRight ->
                     case pos of
                         Left ->
-                            { ball | dir = UpLeft }
+                            { ball
+                                | dir = UpLeft
+                                , dirAngle = gentleAngle <| .dirAngle ball
+                            }
 
                         Right ->
                             { ball
                                 | dir = UpRight
-                                , dirAngle = DicrectionAngle30
+                                , dirAngle = sharpAngle <| .dirAngle ball
                             }
 
                         Center ->
-                            { ball
-                                | dir = UpRight
-                                , dirAngle = DicrectionAngle45
-                            }
+                            { ball | dir = UpRight }
 
                 _ ->
                     ball
