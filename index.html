@@ -5479,11 +5479,11 @@ var $author$project$Card$numberEquals = F2(
 	});
 var $author$project$Main$lastOpenedNumberIsEqualTo = F2(
 	function (c, gameState) {
-		var lastOpened = function ($) {
+		var _v0 = function ($) {
 			return $.lastOpened;
 		}(gameState);
-		if (lastOpened.$ === 'Just') {
-			var n = lastOpened.a;
+		if (_v0.$ === 'Just') {
+			var n = _v0.a;
 			return A2($author$project$Card$numberEquals, c, n);
 		} else {
 			return false;
@@ -5779,14 +5779,16 @@ var $elm$random$Random$int = F2(
 			});
 	});
 var $author$project$Main$randomDegree = A2($elm$random$Random$int, 0, 359);
-var $author$project$Main$randomPosition = A2($elm$random$Random$int, 0, 300);
+var $author$project$Main$randomPosition = function (max) {
+	return A2($elm$random$Random$int, 0, max);
+};
 var $author$project$Main$randomShowState = function (mouseOvered) {
 	return A4(
 		$elm$random$Random$map3,
 		$author$project$Main$ShowState(mouseOvered),
 		$author$project$Main$randomDegree,
-		$author$project$Main$randomPosition,
-		$author$project$Main$randomPosition);
+		$author$project$Main$randomPosition(30),
+		$author$project$Main$randomPosition(100));
 };
 var $author$project$Main$randomCardState = function (_v0) {
 	var c = _v0.a;
@@ -6476,248 +6478,242 @@ var $elm$html$Html$Events$onMouseLeave = function (msg) {
 		'mouseleave',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Card$showCard = F2(
-	function (open, c) {
-		if (!open) {
-			return '🂠';
-		} else {
-			if (c.$ === 'Card') {
-				switch (c.a.$) {
-					case 'Spades':
-						switch (c.b.$) {
-							case 'Ace':
-								var _v1 = c.a;
-								var _v2 = c.b;
-								return '🂡';
-							case 'Two':
-								var _v3 = c.a;
-								var _v4 = c.b;
-								return '🂢';
-							case 'Three':
-								var _v5 = c.a;
-								var _v6 = c.b;
-								return '🂣';
-							case 'Four':
-								var _v7 = c.a;
-								var _v8 = c.b;
-								return '🂤';
-							case 'Five':
-								var _v9 = c.a;
-								var _v10 = c.b;
-								return '🂥';
-							case 'Six':
-								var _v11 = c.a;
-								var _v12 = c.b;
-								return '🂦';
-							case 'Seven':
-								var _v13 = c.a;
-								var _v14 = c.b;
-								return '🂧';
-							case 'Eight':
-								var _v15 = c.a;
-								var _v16 = c.b;
-								return '🂨';
-							case 'Nine':
-								var _v17 = c.a;
-								var _v18 = c.b;
-								return '🂩';
-							case 'Ten':
-								var _v19 = c.a;
-								var _v20 = c.b;
-								return '🂪';
-							case 'Jack':
-								var _v21 = c.a;
-								var _v22 = c.b;
-								return '🂫';
-							case 'Queen':
-								var _v23 = c.a;
-								var _v24 = c.b;
-								return '🂭';
-							default:
-								var _v25 = c.a;
-								var _v26 = c.b;
-								return '🂮';
-						}
-					case 'Hearts':
-						switch (c.b.$) {
-							case 'Ace':
-								var _v27 = c.a;
-								var _v28 = c.b;
-								return '🂱';
-							case 'Two':
-								var _v29 = c.a;
-								var _v30 = c.b;
-								return '🂲';
-							case 'Three':
-								var _v31 = c.a;
-								var _v32 = c.b;
-								return '🂳';
-							case 'Four':
-								var _v33 = c.a;
-								var _v34 = c.b;
-								return '🂴';
-							case 'Five':
-								var _v35 = c.a;
-								var _v36 = c.b;
-								return '🂵';
-							case 'Six':
-								var _v37 = c.a;
-								var _v38 = c.b;
-								return '🂶';
-							case 'Seven':
-								var _v39 = c.a;
-								var _v40 = c.b;
-								return '🂷';
-							case 'Eight':
-								var _v41 = c.a;
-								var _v42 = c.b;
-								return '🂸';
-							case 'Nine':
-								var _v43 = c.a;
-								var _v44 = c.b;
-								return '🂹';
-							case 'Ten':
-								var _v45 = c.a;
-								var _v46 = c.b;
-								return '🂺';
-							case 'Jack':
-								var _v47 = c.a;
-								var _v48 = c.b;
-								return '🂻';
-							case 'Queen':
-								var _v49 = c.a;
-								var _v50 = c.b;
-								return '🂽';
-							default:
-								var _v51 = c.a;
-								var _v52 = c.b;
-								return '🂾';
-						}
-					case 'Diamonds':
-						switch (c.b.$) {
-							case 'Ace':
-								var _v53 = c.a;
-								var _v54 = c.b;
-								return '🃁';
-							case 'Two':
-								var _v55 = c.a;
-								var _v56 = c.b;
-								return '🃂';
-							case 'Three':
-								var _v57 = c.a;
-								var _v58 = c.b;
-								return '🃃';
-							case 'Four':
-								var _v59 = c.a;
-								var _v60 = c.b;
-								return '🃄';
-							case 'Five':
-								var _v61 = c.a;
-								var _v62 = c.b;
-								return '🃅';
-							case 'Six':
-								var _v63 = c.a;
-								var _v64 = c.b;
-								return '🃆';
-							case 'Seven':
-								var _v65 = c.a;
-								var _v66 = c.b;
-								return '🃇';
-							case 'Eight':
-								var _v67 = c.a;
-								var _v68 = c.b;
-								return '🃈';
-							case 'Nine':
-								var _v69 = c.a;
-								var _v70 = c.b;
-								return '🃉';
-							case 'Ten':
-								var _v71 = c.a;
-								var _v72 = c.b;
-								return '🃊';
-							case 'Jack':
-								var _v73 = c.a;
-								var _v74 = c.b;
-								return '🃋';
-							case 'Queen':
-								var _v75 = c.a;
-								var _v76 = c.b;
-								return '🃍';
-							default:
-								var _v77 = c.a;
-								var _v78 = c.b;
-								return '🃎';
-						}
+var $author$project$Card$showCard = function (c) {
+	if (c.$ === 'Card') {
+		switch (c.a.$) {
+			case 'Spades':
+				switch (c.b.$) {
+					case 'Ace':
+						var _v1 = c.a;
+						var _v2 = c.b;
+						return '🂡';
+					case 'Two':
+						var _v3 = c.a;
+						var _v4 = c.b;
+						return '🂢';
+					case 'Three':
+						var _v5 = c.a;
+						var _v6 = c.b;
+						return '🂣';
+					case 'Four':
+						var _v7 = c.a;
+						var _v8 = c.b;
+						return '🂤';
+					case 'Five':
+						var _v9 = c.a;
+						var _v10 = c.b;
+						return '🂥';
+					case 'Six':
+						var _v11 = c.a;
+						var _v12 = c.b;
+						return '🂦';
+					case 'Seven':
+						var _v13 = c.a;
+						var _v14 = c.b;
+						return '🂧';
+					case 'Eight':
+						var _v15 = c.a;
+						var _v16 = c.b;
+						return '🂨';
+					case 'Nine':
+						var _v17 = c.a;
+						var _v18 = c.b;
+						return '🂩';
+					case 'Ten':
+						var _v19 = c.a;
+						var _v20 = c.b;
+						return '🂪';
+					case 'Jack':
+						var _v21 = c.a;
+						var _v22 = c.b;
+						return '🂫';
+					case 'Queen':
+						var _v23 = c.a;
+						var _v24 = c.b;
+						return '🂭';
 					default:
-						switch (c.b.$) {
-							case 'Ace':
-								var _v79 = c.a;
-								var _v80 = c.b;
-								return '🃑';
-							case 'Two':
-								var _v81 = c.a;
-								var _v82 = c.b;
-								return '🃒';
-							case 'Three':
-								var _v83 = c.a;
-								var _v84 = c.b;
-								return '🃓';
-							case 'Four':
-								var _v85 = c.a;
-								var _v86 = c.b;
-								return '🃔';
-							case 'Five':
-								var _v87 = c.a;
-								var _v88 = c.b;
-								return '🃕';
-							case 'Six':
-								var _v89 = c.a;
-								var _v90 = c.b;
-								return '🃖';
-							case 'Seven':
-								var _v91 = c.a;
-								var _v92 = c.b;
-								return '🃗';
-							case 'Eight':
-								var _v93 = c.a;
-								var _v94 = c.b;
-								return '🃘';
-							case 'Nine':
-								var _v95 = c.a;
-								var _v96 = c.b;
-								return '🃙';
-							case 'Ten':
-								var _v97 = c.a;
-								var _v98 = c.b;
-								return '🃚';
-							case 'Jack':
-								var _v99 = c.a;
-								var _v100 = c.b;
-								return '🃛';
-							case 'Queen':
-								var _v101 = c.a;
-								var _v102 = c.b;
-								return '🃝';
-							default:
-								var _v103 = c.a;
-								var _v104 = c.b;
-								return '🃞';
-						}
+						var _v25 = c.a;
+						var _v26 = c.b;
+						return '🂮';
 				}
-			} else {
-				return '🃟';
-			}
+			case 'Hearts':
+				switch (c.b.$) {
+					case 'Ace':
+						var _v27 = c.a;
+						var _v28 = c.b;
+						return '🂱';
+					case 'Two':
+						var _v29 = c.a;
+						var _v30 = c.b;
+						return '🂲';
+					case 'Three':
+						var _v31 = c.a;
+						var _v32 = c.b;
+						return '🂳';
+					case 'Four':
+						var _v33 = c.a;
+						var _v34 = c.b;
+						return '🂴';
+					case 'Five':
+						var _v35 = c.a;
+						var _v36 = c.b;
+						return '🂵';
+					case 'Six':
+						var _v37 = c.a;
+						var _v38 = c.b;
+						return '🂶';
+					case 'Seven':
+						var _v39 = c.a;
+						var _v40 = c.b;
+						return '🂷';
+					case 'Eight':
+						var _v41 = c.a;
+						var _v42 = c.b;
+						return '🂸';
+					case 'Nine':
+						var _v43 = c.a;
+						var _v44 = c.b;
+						return '🂹';
+					case 'Ten':
+						var _v45 = c.a;
+						var _v46 = c.b;
+						return '🂺';
+					case 'Jack':
+						var _v47 = c.a;
+						var _v48 = c.b;
+						return '🂻';
+					case 'Queen':
+						var _v49 = c.a;
+						var _v50 = c.b;
+						return '🂽';
+					default:
+						var _v51 = c.a;
+						var _v52 = c.b;
+						return '🂾';
+				}
+			case 'Diamonds':
+				switch (c.b.$) {
+					case 'Ace':
+						var _v53 = c.a;
+						var _v54 = c.b;
+						return '🃁';
+					case 'Two':
+						var _v55 = c.a;
+						var _v56 = c.b;
+						return '🃂';
+					case 'Three':
+						var _v57 = c.a;
+						var _v58 = c.b;
+						return '🃃';
+					case 'Four':
+						var _v59 = c.a;
+						var _v60 = c.b;
+						return '🃄';
+					case 'Five':
+						var _v61 = c.a;
+						var _v62 = c.b;
+						return '🃅';
+					case 'Six':
+						var _v63 = c.a;
+						var _v64 = c.b;
+						return '🃆';
+					case 'Seven':
+						var _v65 = c.a;
+						var _v66 = c.b;
+						return '🃇';
+					case 'Eight':
+						var _v67 = c.a;
+						var _v68 = c.b;
+						return '🃈';
+					case 'Nine':
+						var _v69 = c.a;
+						var _v70 = c.b;
+						return '🃉';
+					case 'Ten':
+						var _v71 = c.a;
+						var _v72 = c.b;
+						return '🃊';
+					case 'Jack':
+						var _v73 = c.a;
+						var _v74 = c.b;
+						return '🃋';
+					case 'Queen':
+						var _v75 = c.a;
+						var _v76 = c.b;
+						return '🃍';
+					default:
+						var _v77 = c.a;
+						var _v78 = c.b;
+						return '🃎';
+				}
+			default:
+				switch (c.b.$) {
+					case 'Ace':
+						var _v79 = c.a;
+						var _v80 = c.b;
+						return '🃑';
+					case 'Two':
+						var _v81 = c.a;
+						var _v82 = c.b;
+						return '🃒';
+					case 'Three':
+						var _v83 = c.a;
+						var _v84 = c.b;
+						return '🃓';
+					case 'Four':
+						var _v85 = c.a;
+						var _v86 = c.b;
+						return '🃔';
+					case 'Five':
+						var _v87 = c.a;
+						var _v88 = c.b;
+						return '🃕';
+					case 'Six':
+						var _v89 = c.a;
+						var _v90 = c.b;
+						return '🃖';
+					case 'Seven':
+						var _v91 = c.a;
+						var _v92 = c.b;
+						return '🃗';
+					case 'Eight':
+						var _v93 = c.a;
+						var _v94 = c.b;
+						return '🃘';
+					case 'Nine':
+						var _v95 = c.a;
+						var _v96 = c.b;
+						return '🃙';
+					case 'Ten':
+						var _v97 = c.a;
+						var _v98 = c.b;
+						return '🃚';
+					case 'Jack':
+						var _v99 = c.a;
+						var _v100 = c.b;
+						return '🃛';
+					case 'Queen':
+						var _v101 = c.a;
+						var _v102 = c.b;
+						return '🃝';
+					default:
+						var _v103 = c.a;
+						var _v104 = c.b;
+						return '🃞';
+				}
 		}
-	});
+	} else {
+		return '🃟';
+	}
+};
+var $author$project$Card$showCardBack = '🂠';
 var $author$project$Main$showCardState = function (s) {
 	if (s.b.$ === 'FaceDown') {
-		var c = s.a;
 		var _v1 = s.b;
-		return A2($author$project$Card$showCard, false, c);
+		return $author$project$Card$showCardBack;
 	} else {
 		var c = s.a;
-		return A2($author$project$Card$showCard, true, c);
+		return $author$project$Card$showCard(c);
 	}
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
