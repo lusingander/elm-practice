@@ -170,6 +170,26 @@ ballTop ball =
     .y ball + ballRadius
 
 
+blockLeft : Block -> Float
+blockLeft block =
+    .x block - (.w block / 2)
+
+
+blockRight : Block -> Float
+blockRight block =
+    .x block + (.w block / 2)
+
+
+blockTop : Block -> Float
+blockTop block =
+    .y block + (.h block / 2)
+
+
+blockBottom : Block -> Float
+blockBottom block =
+    .y block - (.h block / 2)
+
+
 ballBottom : Ball -> Float
 ballBottom ball =
     .y ball - ballRadius
@@ -198,6 +218,67 @@ ballHitFieldBottomEdge ball =
 ballHitBar : Ball -> Bar -> Bool
 ballHitBar ball bar =
     barLeft bar <= .x ball && .x ball <= barRight bar && ballBottom ball <= barTop bar
+
+
+ballHitBlock : Ball -> Block -> Bool
+ballHitBlock ball block =
+    let
+        cx =
+            .x ball
+
+        cy =
+            .y ball
+
+        cr =
+            ballRadius
+
+        t =
+            blockTop block
+
+        b =
+            blockBottom block
+
+        l =
+            blockLeft block
+
+        r =
+            blockRight block
+
+        lcx2 =
+            (l - cx) ^ 2
+
+        rcx2 =
+            (r - cx) ^ 2
+
+        tcy2 =
+            (t - cy) ^ 2
+
+        bcy2 =
+            (b - cy) ^ 2
+
+        cr2 =
+            cr ^ 2
+    in
+    (l <= cx && cx <= r && b - cr <= cy && cy <= t + cr)
+        || (l - cr <= cx && cx <= r + cr && b <= cy && cy <= t)
+        || (lcx2 + tcy2 <= cr2)
+        || (rcx2 + tcy2 <= cr2)
+        || (lcx2 + bcy2 <= cr2)
+        || (rcx2 + bcy2 <= cr2)
+
+
+breakBlock : Ball -> List Block -> List Block
+breakBlock ball blocks =
+    case blocks of
+        [] ->
+            []
+
+        b :: bs ->
+            if ballHitBlock ball b then
+                bs
+
+            else
+                b :: breakBlock ball bs
 
 
 view : Computer -> Memory -> List Shape
@@ -269,6 +350,7 @@ update computer memory =
                 | playingState = getPlayingState newBall
                 , bar = .bar memory |> moveBar (5 * toX computer.keyboard)
                 , ball = newBall
+                , blocks = .blocks memory |> breakBlock newBall
             }
 
         GameOver ->
