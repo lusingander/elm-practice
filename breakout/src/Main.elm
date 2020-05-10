@@ -8,9 +8,15 @@ main =
 
 
 type alias Memory =
-    { bar : Bar
+    { playingState : PlayingState
+    , bar : Bar
     , ball : Ball
     }
+
+
+type PlayingState
+    = Playing
+    | GameOver
 
 
 type alias Bar =
@@ -62,18 +68,17 @@ ballRadius =
 
 initMemory : Memory
 initMemory =
-    { bar =
-        { x = 0
-        , y = (barHeight * 2) - (fieldHeight / 2)
-        , w = barWidth
-        , h = barHeight
-        }
-    , ball =
-        { x = 0
-        , y = 0
-        , dir = DownRight
-        }
-    }
+    Memory Playing initBar initBall
+
+
+initBar : Bar
+initBar =
+    Bar 0 ((barHeight * 2) - (fieldHeight / 2)) barWidth barHeight
+
+
+initBall : Ball
+initBall =
+    Ball 0 0 DownRight
 
 
 barLeft : Bar -> Float
@@ -174,10 +179,20 @@ showBall ball =
 
 update : Computer -> Memory -> Memory
 update computer memory =
-    { memory
-        | bar = .bar memory |> moveBar (5 * toX computer.keyboard)
-        , ball = moveBall memory
-    }
+    case .playingState memory of
+        Playing ->
+            let
+                newBall =
+                    moveBall memory
+            in
+            { memory
+                | playingState = getPlayingState newBall
+                , bar = .bar memory |> moveBar (5 * toX computer.keyboard)
+                , ball = newBall
+            }
+
+        GameOver ->
+            memory
 
 
 moveBar : Float -> Bar -> Bar
@@ -265,9 +280,6 @@ moveBall memory =
             else if ballHitFieldLeftEdge newBall then
                 { newBall | dir = DownRight }
 
-            else if ballHitFieldBottomEdge newBall then
-                { newBall | dir = UpLeft }
-
             else
                 newBall
 
@@ -285,8 +297,14 @@ moveBall memory =
             else if ballHitFieldRightEdge newBall then
                 { newBall | dir = DownLeft }
 
-            else if ballHitFieldBottomEdge newBall then
-                { newBall | dir = UpRight }
-
             else
                 newBall
+
+
+getPlayingState : Ball -> PlayingState
+getPlayingState ball =
+    if ballHitFieldBottomEdge ball then
+        GameOver
+
+    else
+        Playing
