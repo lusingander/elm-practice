@@ -11,6 +11,7 @@ type alias Memory =
     { playingState : PlayingState
     , bar : Bar
     , ball : Ball
+    , blocks : List Block
     }
 
 
@@ -41,6 +42,14 @@ type BallDirection
     | DownRight
 
 
+type alias Block =
+    { x : Float
+    , y : Float
+    , w : Float
+    , h : Float
+    }
+
+
 fieldWidth : Float
 fieldWidth =
     800
@@ -66,9 +75,24 @@ ballRadius =
     10
 
 
+blockMargin : Float
+blockMargin =
+    5
+
+
+blockWidth : Float
+blockWidth =
+    70
+
+
+blockHeight : Float
+blockHeight =
+    20
+
+
 initMemory : Memory
 initMemory =
-    Memory Playing initBar initBall
+    Memory Playing initBar initBall initBlocks
 
 
 initBar : Bar
@@ -79,6 +103,32 @@ initBar =
 initBall : Ball
 initBall =
     Ball 0 0 DownRight
+
+
+initBlocks : List Block
+initBlocks =
+    createBlocks 6 0 (-(fieldWidth / 2) + blockMargin) ((fieldHeight / 2) - blockMargin)
+
+
+createBlocks : Int -> Int -> Float -> Float -> List Block
+createBlocks max lines leftTopX leftTopY =
+    if lines == max then
+        []
+
+    else
+        let
+            newBlock =
+                { x = leftTopX + blockWidth / 2
+                , y = leftTopY - blockHeight / 2
+                , w = blockWidth
+                , h = blockHeight
+                }
+        in
+        if leftTopX + blockWidth >= (fieldWidth / 2) then
+            createBlocks max (lines + 1) (-(fieldWidth / 2) + blockMargin) (((fieldHeight / 2) - blockMargin) - ((blockHeight + blockMargin) * (lines + 1 |> toFloat)))
+
+        else
+            newBlock :: createBlocks max lines (leftTopX + blockWidth + (blockMargin * 2)) leftTopY
 
 
 barLeft : Bar -> Float
@@ -158,12 +208,16 @@ view _ memory =
 
         ball =
             .ball memory
+
+        blocks =
+            .blocks memory
     in
     List.concat
         [ [ rectangle darkGray fieldWidth fieldHeight
           , showBar bar
           , showBall ball
           ]
+        , showBlocks blocks
         , showGameMessage memory
         ]
 
@@ -190,6 +244,17 @@ showBall : Ball -> Shape
 showBall ball =
     circle darkRed ballRadius
         |> move (.x ball) (.y ball)
+
+
+showBlocks : List Block -> List Shape
+showBlocks blocks =
+    List.map showBlock blocks
+
+
+showBlock : Block -> Shape
+showBlock block =
+    rectangle darkYellow (.w block) (.h block)
+        |> move (.x block) (.y block)
 
 
 update : Computer -> Memory -> Memory
