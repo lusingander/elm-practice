@@ -463,7 +463,7 @@ moveBallDeltaX : BallDirectionAngle -> Float
 moveBallDeltaX angle =
     case angle of
         DicrectionAngle30 ->
-            moveBallDelta * 2 / 1.732
+            (moveBallDelta / 2) * 1.732
 
         DicrectionAngle45 ->
             moveBallDelta / 1.414
@@ -482,7 +482,7 @@ moveBallDeltaY angle =
             moveBallDelta / 1.414
 
         DicrectionAngle60 ->
-            moveBallDelta * 2 / 1.732
+            (moveBallDelta / 2) * 1.732
 
 
 moveBall : Memory -> Ball
