@@ -6955,7 +6955,7 @@ var $author$project$Main$moveBallDelta = 5;
 var $author$project$Main$moveBallDeltaX = function (angle) {
 	switch (angle.$) {
 		case 'DicrectionAngle30':
-			return ($author$project$Main$moveBallDelta * 2) / 1.732;
+			return ($author$project$Main$moveBallDelta / 2) * 1.732;
 		case 'DicrectionAngle45':
 			return $author$project$Main$moveBallDelta / 1.414;
 		default:
@@ -6969,7 +6969,7 @@ var $author$project$Main$moveBallDeltaY = function (angle) {
 		case 'DicrectionAngle45':
 			return $author$project$Main$moveBallDelta / 1.414;
 		default:
-			return ($author$project$Main$moveBallDelta * 2) / 1.732;
+			return ($author$project$Main$moveBallDelta / 2) * 1.732;
 	}
 };
 var $author$project$Main$DownLeft = {$: 'DownLeft'};
