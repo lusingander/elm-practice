@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Array
 import Browser
 import Html exposing (Html, button, div, span, text, textarea)
 import Html.Attributes exposing (disabled, style)
@@ -21,15 +22,27 @@ type alias Model =
     , pointer : Pointer
     , currentStep : Int
     , inputAreaText : String
+    , source : String
     }
 
 
 type alias Memory =
-    List Int
+    Array.Array Int
 
 
 type alias Pointer =
     Int
+
+
+type Command
+    = IncrementPointer
+    | DecrementPointer
+    | IncrementValue
+    | DecrementValue
+    | Output
+    | Input
+    | JumpForward
+    | JumpBack
 
 
 init : Model
@@ -43,17 +56,127 @@ initModel =
     , pointer = initPointer
     , currentStep = 0
     , inputAreaText = ""
+    , source = ""
     }
 
 
 initMemory : Memory
 initMemory =
-    List.repeat 20 0
+    Array.repeat 20 0
 
 
 initPointer : Pointer
 initPointer =
     0
+
+
+start : Model -> Model
+start model =
+    { model
+        | memory = initMemory
+        , pointer = 0
+        , currentStep = 0
+        , source = .inputAreaText model
+    }
+
+
+step : Model -> Model
+step model =
+    let
+        cs =
+            .currentStep model
+
+        cp =
+            .pointer model
+
+        command =
+            currentCommand model
+    in
+    case command of
+        IncrementPointer ->
+            { model
+                | currentStep = cs + 1
+                , pointer = cp + 1
+            }
+
+        DecrementPointer ->
+            { model
+                | currentStep = cs + 1
+                , pointer = cp - 1
+            }
+
+        IncrementValue ->
+            { model
+                | currentStep = cs + 1
+                , memory = incrementArrayValue cp (.memory model)
+            }
+
+        DecrementValue ->
+            { model
+                | currentStep = cs + 1
+                , memory = decrementArrayValue cp (.memory model)
+            }
+
+        _ ->
+            { model
+                | currentStep = cs + 1
+            }
+
+
+incrementArrayValue : Int -> Array.Array Int -> Array.Array Int
+incrementArrayValue index array =
+    case Array.get index array of
+        Just v ->
+            Array.set index (v + 1) array
+
+        Nothing ->
+            array
+
+
+decrementArrayValue : Int -> Array.Array Int -> Array.Array Int
+decrementArrayValue index array =
+    case Array.get index array of
+        Just v ->
+            Array.set index (v - 1) array
+
+        Nothing ->
+            array
+
+
+currentCommand : Model -> Command
+currentCommand model =
+    .source model
+        |> String.dropLeft (.currentStep model)
+        |> String.left 1
+        |> stringToCommand
+
+
+stringToCommand : String -> Command
+stringToCommand s =
+    case s of
+        ">" ->
+            IncrementPointer
+
+        "<" ->
+            DecrementPointer
+
+        "+" ->
+            IncrementValue
+
+        "-" ->
+            DecrementValue
+
+        "." ->
+            Output
+
+        "[" ->
+            JumpForward
+
+        "]" ->
+            JumpBack
+
+        _ ->
+            Input
 
 
 type Msg
@@ -66,12 +189,10 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Start ->
-            model
+            start model
 
         StepNext ->
-            { model
-                | currentStep = .currentStep model + 1
-            }
+            step model
 
         InputAreaUpdate input ->
             { model
@@ -101,7 +222,9 @@ viewStatus memory pointer =
 
 viewMemory : Memory -> Pointer -> Html Msg
 viewMemory memory pointer =
-    span [] <| List.indexedMap (\i m -> viewSingleMemory (i == pointer) m) memory
+    span [] <|
+        Array.toList <|
+            Array.indexedMap (\i m -> viewSingleMemory (i == pointer) m) memory
 
 
 viewSingleMemory : Bool -> Int -> Html Msg
