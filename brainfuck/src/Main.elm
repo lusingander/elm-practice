@@ -231,6 +231,8 @@ update msg model =
         InputAreaUpdate input ->
             { model
                 | inputAreaText = input
+                , output = ""
+                , source = ""
             }
 
 
@@ -241,7 +243,7 @@ view model =
         [ viewStatus (.memory model) (.pointer model)
         , viewInputArea
         , viewOutputArea (.output model)
-        , viewShowArea (.inputAreaText model) (.currentStep model)
+        , viewShowArea (.source model) (.currentStep model)
         ]
 
 
