@@ -1,9 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, span, text)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html exposing (Html, button, div, span, text, textarea)
+import Html.Attributes exposing (disabled, style)
+import Html.Events exposing (onClick, onInput)
 import String exposing (fromInt)
 
 
@@ -19,6 +19,8 @@ main =
 type alias Model =
     { memory : Memory
     , pointer : Pointer
+    , currentStep : Int
+    , inputAreaText : String
     }
 
 
@@ -37,7 +39,11 @@ init =
 
 initModel : Model
 initModel =
-    Model initMemory initPointer
+    { memory = initMemory
+    , pointer = initPointer
+    , currentStep = 0
+    , inputAreaText = ""
+    }
 
 
 initMemory : Memory
@@ -51,21 +57,36 @@ initPointer =
 
 
 type Msg
-    = StepNext
+    = Start
+    | StepNext
+    | InputAreaUpdate String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        _ ->
+        Start ->
             model
+
+        StepNext ->
+            { model
+                | currentStep = .currentStep model + 1
+            }
+
+        InputAreaUpdate input ->
+            { model
+                | inputAreaText = input
+            }
 
 
 view : Model -> Html Msg
 view model =
     div
         [ style "margin" "30px" ]
-        [ viewStatus (.memory model) (.pointer model) ]
+        [ viewStatus (.memory model) (.pointer model)
+        , viewInputArea
+        , viewShowArea (.inputAreaText model)
+        ]
 
 
 viewStatus : Memory -> Pointer -> Html Msg
@@ -73,6 +94,7 @@ viewStatus memory pointer =
     div []
         [ viewMemory memory pointer
         , div [] [ text <| "pointer: " ++ fromInt pointer ]
+        , button [ onClick Start ] [ text "Start" ]
         , button [ onClick StepNext ] [ text "Next" ]
         ]
 
@@ -96,3 +118,38 @@ viewSingleMemory current n =
                )
         )
         [ text <| fromInt n ]
+
+
+viewInputArea : Html Msg
+viewInputArea =
+    div []
+        [ textarea
+            (inputAreaStyles
+                ++ [ onInput InputAreaUpdate
+                   ]
+            )
+            []
+        ]
+
+
+viewShowArea : String -> Html Msg
+viewShowArea input =
+    div []
+        [ textarea
+            (inputAreaStyles
+                ++ [ style "border" "1px solid"
+                   , disabled True
+                   ]
+            )
+            [ text input
+            ]
+        ]
+
+
+inputAreaStyles : List (Html.Attribute Msg)
+inputAreaStyles =
+    [ style "width" "300px"
+    , style "height" "100px"
+    , style "font-size" "20px"
+    , style "font-family" "\"Courier New\", monospace"
+    ]
