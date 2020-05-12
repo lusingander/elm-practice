@@ -235,8 +235,8 @@ view model =
         [ style "margin" "30px" ]
         [ viewStatus (.memory model) (.pointer model)
         , viewInputArea
-        , viewShowArea (.inputAreaText model)
         , viewOutputArea (.output model)
+        , viewShowArea (.inputAreaText model)
         ]
 
 
@@ -276,7 +276,8 @@ viewSingleMemory current n =
 viewInputArea : Html Msg
 viewInputArea =
     div []
-        [ textarea
+        [ div [] [ text "Input:" ]
+        , textarea
             (inputAreaStyles
                 ++ [ onInput InputAreaUpdate
                    ]
@@ -288,9 +289,11 @@ viewInputArea =
 viewShowArea : String -> Html Msg
 viewShowArea input =
     div []
-        [ textarea
+        [ div [] [ text "Visual:" ]
+        , div
             (inputAreaStyles
                 ++ [ style "border" "1px solid"
+                   , style "word-break" "break-all"
                    , disabled True
                    ]
             )
@@ -301,8 +304,8 @@ viewShowArea input =
 
 inputAreaStyles : List (Html.Attribute Msg)
 inputAreaStyles =
-    [ style "width" "300px"
-    , style "height" "100px"
+    [ style "width" "600px"
+    , style "height" "200px"
     , style "font-size" "20px"
     , style "font-family" "\"Courier New\", monospace"
     ]
