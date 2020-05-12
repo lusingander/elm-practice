@@ -180,6 +180,11 @@ currentCommand currentStep model =
         |> stringToCommand
 
 
+indexChar : Int -> String -> String
+indexChar index str =
+    String.dropLeft index str |> String.left 1
+
+
 stringToCommand : String -> Command
 stringToCommand s =
     case s of
@@ -236,7 +241,7 @@ view model =
         [ viewStatus (.memory model) (.pointer model)
         , viewInputArea
         , viewOutputArea (.output model)
-        , viewShowArea (.inputAreaText model)
+        , viewShowArea (.inputAreaText model) (.currentStep model)
         ]
 
 
@@ -286,8 +291,19 @@ viewInputArea =
         ]
 
 
-viewShowArea : String -> Html Msg
-viewShowArea input =
+viewShowArea : String -> Int -> Html Msg
+viewShowArea input current =
+    let
+        ( prevString, currentChar, forwardString ) =
+            if current >= 0 then
+                ( String.left current input
+                , indexChar current input
+                , String.dropLeft (current + 1) input
+                )
+
+            else
+                ( input, "", "" )
+    in
     div []
         [ div [] [ text "Visual:" ]
         , div
@@ -297,7 +313,12 @@ viewShowArea input =
                    , disabled True
                    ]
             )
-            [ text input
+            [ span [] [ text prevString ]
+            , span
+                [ style "color" "red"
+                ]
+                [ text currentChar ]
+            , span [] [ text forwardString ]
             ]
         ]
 
