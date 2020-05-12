@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Array
 import Browser
+import Dict
 import Html exposing (Html, button, div, span, text, textarea)
 import Html.Attributes exposing (disabled, style)
 import Html.Events exposing (onClick, onInput)
@@ -23,6 +24,7 @@ type alias Model =
     , currentStep : Int
     , inputAreaText : String
     , source : String
+    , output : String
     }
 
 
@@ -57,6 +59,7 @@ initModel =
     , currentStep = initCurrentStep
     , inputAreaText = ""
     , source = ""
+    , output = ""
     }
 
 
@@ -82,6 +85,7 @@ start model =
         , pointer = initPointer
         , currentStep = initCurrentStep
         , source = .inputAreaText model
+        , output = ""
     }
 
 
@@ -93,6 +97,9 @@ step model =
 
         cp =
             .pointer model
+
+        cm =
+            .memory model
 
         command =
             currentCommand cs model
@@ -113,19 +120,29 @@ step model =
         IncrementValue ->
             { model
                 | currentStep = cs
-                , memory = incrementArrayValue cp (.memory model)
+                , memory = incrementArrayValue cp cm
             }
 
         DecrementValue ->
             { model
                 | currentStep = cs
-                , memory = decrementArrayValue cp (.memory model)
+                , memory = decrementArrayValue cp cm
             }
 
-        _ ->
+        Output ->
             { model
-                | currentStep = cs + 1
+                | currentStep = cs
+                , output = .output model ++ outputPointerByteString cp cm
             }
+
+        Input ->
+            model
+
+        JumpForward ->
+            model
+
+        JumpBack ->
+            model
 
 
 incrementArrayValue : Int -> Array.Array Int -> Array.Array Int
@@ -146,6 +163,13 @@ decrementArrayValue index array =
 
         Nothing ->
             array
+
+
+outputPointerByteString : Int -> Array.Array Int -> String
+outputPointerByteString index array =
+    Array.get index array
+        |> Maybe.andThen ascii
+        |> Maybe.withDefault ""
 
 
 currentCommand : Int -> Model -> Command
@@ -212,6 +236,7 @@ view model =
         [ viewStatus (.memory model) (.pointer model)
         , viewInputArea
         , viewShowArea (.inputAreaText model)
+        , viewOutputArea (.output model)
         ]
 
 
@@ -281,3 +306,112 @@ inputAreaStyles =
     , style "font-size" "20px"
     , style "font-family" "\"Courier New\", monospace"
     ]
+
+
+viewOutputArea : String -> Html Msg
+viewOutputArea output =
+    div []
+        [ text <| "Output: " ++ output
+        ]
+
+
+ascii : Int -> Maybe String
+ascii n =
+    Dict.get n <|
+        Dict.fromList
+            [ ( 32, "Space" )
+            , ( 33, "!" )
+            , ( 34, "\"" )
+            , ( 35, "#" )
+            , ( 36, "$" )
+            , ( 37, "%" )
+            , ( 38, "&" )
+            , ( 39, "'" )
+            , ( 40, "(" )
+            , ( 41, ")" )
+            , ( 42, "*" )
+            , ( 43, "+" )
+            , ( 44, "," )
+            , ( 45, "-" )
+            , ( 46, "." )
+            , ( 47, "/" )
+            , ( 48, "0" )
+            , ( 49, "1" )
+            , ( 50, "2" )
+            , ( 51, "3" )
+            , ( 52, "4" )
+            , ( 53, "5" )
+            , ( 54, "6" )
+            , ( 55, "7" )
+            , ( 56, "8" )
+            , ( 57, "9" )
+            , ( 58, ":" )
+            , ( 59, ";" )
+            , ( 60, "<" )
+            , ( 61, "=" )
+            , ( 62, ">" )
+            , ( 63, "?" )
+            , ( 64, "@" )
+            , ( 65, "A" )
+            , ( 66, "B" )
+            , ( 67, "C" )
+            , ( 68, "D" )
+            , ( 69, "E" )
+            , ( 70, "F" )
+            , ( 71, "G" )
+            , ( 72, "H" )
+            , ( 73, "I" )
+            , ( 74, "J" )
+            , ( 75, "K" )
+            , ( 76, "L" )
+            , ( 77, "M" )
+            , ( 78, "N" )
+            , ( 79, "O" )
+            , ( 80, "P" )
+            , ( 81, "Q" )
+            , ( 82, "R" )
+            , ( 83, "S" )
+            , ( 84, "T" )
+            , ( 85, "U" )
+            , ( 86, "V" )
+            , ( 87, "W" )
+            , ( 88, "X" )
+            , ( 89, "Y" )
+            , ( 90, "Z" )
+            , ( 91, "[" )
+            , ( 92, "\\" )
+            , ( 93, "]" )
+            , ( 94, "^" )
+            , ( 95, "_" )
+            , ( 96, "`" )
+            , ( 97, "a" )
+            , ( 98, "b" )
+            , ( 99, "c" )
+            , ( 100, "d" )
+            , ( 101, "e" )
+            , ( 102, "f" )
+            , ( 103, "g" )
+            , ( 104, "h" )
+            , ( 105, "i" )
+            , ( 106, "j" )
+            , ( 107, "k" )
+            , ( 108, "l" )
+            , ( 109, "m" )
+            , ( 110, "n" )
+            , ( 111, "o" )
+            , ( 112, "p" )
+            , ( 113, "q" )
+            , ( 114, "r" )
+            , ( 115, "s" )
+            , ( 116, "t" )
+            , ( 117, "u" )
+            , ( 118, "v" )
+            , ( 119, "w" )
+            , ( 120, "x" )
+            , ( 121, "y" )
+            , ( 122, "z" )
+            , ( 123, "{" )
+            , ( 124, "|" )
+            , ( 125, "}" )
+            , ( 126, "~" )
+            ]
