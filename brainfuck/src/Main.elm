@@ -54,7 +54,7 @@ initModel : Model
 initModel =
     { memory = initMemory
     , pointer = initPointer
-    , currentStep = 0
+    , currentStep = initCurrentStep
     , inputAreaText = ""
     , source = ""
     }
@@ -70,12 +70,17 @@ initPointer =
     0
 
 
+initCurrentStep : Int
+initCurrentStep =
+    -1
+
+
 start : Model -> Model
 start model =
     { model
         | memory = initMemory
-        , pointer = 0
-        , currentStep = 0
+        , pointer = initPointer
+        , currentStep = initCurrentStep
         , source = .inputAreaText model
     }
 
@@ -84,36 +89,36 @@ step : Model -> Model
 step model =
     let
         cs =
-            .currentStep model
+            .currentStep model + 1
 
         cp =
             .pointer model
 
         command =
-            currentCommand model
+            currentCommand cs model
     in
     case command of
         IncrementPointer ->
             { model
-                | currentStep = cs + 1
+                | currentStep = cs
                 , pointer = cp + 1
             }
 
         DecrementPointer ->
             { model
-                | currentStep = cs + 1
+                | currentStep = cs
                 , pointer = cp - 1
             }
 
         IncrementValue ->
             { model
-                | currentStep = cs + 1
+                | currentStep = cs
                 , memory = incrementArrayValue cp (.memory model)
             }
 
         DecrementValue ->
             { model
-                | currentStep = cs + 1
+                | currentStep = cs
                 , memory = decrementArrayValue cp (.memory model)
             }
 
@@ -143,10 +148,10 @@ decrementArrayValue index array =
             array
 
 
-currentCommand : Model -> Command
-currentCommand model =
+currentCommand : Int -> Model -> Command
+currentCommand currentStep model =
     .source model
-        |> String.dropLeft (.currentStep model)
+        |> String.dropLeft currentStep
         |> String.left 1
         |> stringToCommand
 
