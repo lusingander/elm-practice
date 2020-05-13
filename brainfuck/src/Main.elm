@@ -419,7 +419,7 @@ ascii : Int -> Maybe String
 ascii n =
     Dict.get n <|
         Dict.fromList
-            [ ( 32, "Space" )
+            [ ( 32, " " )
             , ( 33, "!" )
             , ( 34, "\"" )
             , ( 35, "#" )
