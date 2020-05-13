@@ -82,7 +82,7 @@ initPointer =
 
 initCurrentStep : Int
 initCurrentStep =
-    -1
+    0
 
 
 buildJumpInfo : String -> JumpInfo
@@ -140,7 +140,8 @@ step : Model -> Model
 step model =
     let
         cs =
-            .currentStep model + 1
+            -- .currentStep model + 1
+            .currentStep model
 
         cp =
             .pointer model
@@ -154,31 +155,31 @@ step model =
     case command of
         IncrementPointer ->
             { model
-                | currentStep = cs
+                | currentStep = cs + 1
                 , pointer = cp + 1
             }
 
         DecrementPointer ->
             { model
-                | currentStep = cs
+                | currentStep = cs + 1
                 , pointer = cp - 1
             }
 
         IncrementValue ->
             { model
-                | currentStep = cs
+                | currentStep = cs + 1
                 , memory = incrementArrayValue cp cm
             }
 
         DecrementValue ->
             { model
-                | currentStep = cs
+                | currentStep = cs + 1
                 , memory = decrementArrayValue cp cm
             }
 
         Output ->
             { model
-                | currentStep = cs
+                | currentStep = cs + 1
                 , output = .output model ++ outputPointerByteString cp cm
             }
 
@@ -194,7 +195,7 @@ step model =
 
                 _ ->
                     { model
-                        | currentStep = cs
+                        | currentStep = cs + 1
                     }
 
         JumpBack ->
