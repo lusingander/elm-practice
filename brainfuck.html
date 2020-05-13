@@ -5504,25 +5504,37 @@ var $elm$core$Array$set = F3(
 			A4($elm$core$Array$setHelp, startShift, index, value, tree),
 			tail));
 	});
+var $elm_community$array_extra$Array$Extra$update = F3(
+	function (n, f, a) {
+		var element = A2($elm$core$Array$get, n, a);
+		if (element.$ === 'Nothing') {
+			return a;
+		} else {
+			var element_ = element.a;
+			return A3(
+				$elm$core$Array$set,
+				n,
+				f(element_),
+				a);
+		}
+	});
 var $author$project$Main$decrementArrayValue = F2(
 	function (index, array) {
-		var _v0 = A2($elm$core$Array$get, index, array);
-		if (_v0.$ === 'Just') {
-			var v = _v0.a;
-			return A3($elm$core$Array$set, index, v - 1, array);
-		} else {
-			return array;
-		}
+		return A3(
+			$elm_community$array_extra$Array$Extra$update,
+			index,
+			function (n) {
+				return n - 1;
+			},
+			array);
 	});
 var $author$project$Main$incrementArrayValue = F2(
 	function (index, array) {
-		var _v0 = A2($elm$core$Array$get, index, array);
-		if (_v0.$ === 'Just') {
-			var v = _v0.a;
-			return A3($elm$core$Array$set, index, v + 1, array);
-		} else {
-			return array;
-		}
+		return A3(
+			$elm_community$array_extra$Array$Extra$update,
+			index,
+			$elm$core$Basics$add(1),
+			array);
 	});
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
