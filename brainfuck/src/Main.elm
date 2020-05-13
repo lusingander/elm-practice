@@ -6,6 +6,7 @@ import Dict
 import Html exposing (Html, button, div, span, text, textarea)
 import Html.Attributes exposing (disabled, style)
 import Html.Events exposing (onClick, onInput)
+import List.Extra
 import String exposing (fromInt)
 
 
@@ -25,6 +26,7 @@ type alias Model =
     , inputAreaText : String
     , source : String
     , output : String
+    , jumpInfo : JumpInfo
     }
 
 
@@ -47,6 +49,10 @@ type Command
     | JumpBack
 
 
+type alias JumpInfo =
+    List ( Int, Int )
+
+
 init : Model
 init =
     initModel
@@ -60,6 +66,7 @@ initModel =
     , inputAreaText = ""
     , source = ""
     , output = ""
+    , jumpInfo = []
     }
 
 
@@ -78,14 +85,54 @@ initCurrentStep =
     -1
 
 
+buildJumpInfo : String -> JumpInfo
+buildJumpInfo source =
+    buildJumpInfoStack source 0 (String.length source) [] []
+
+
+buildJumpInfoStack : String -> Int -> Int -> List ( Int, Int ) -> List ( Int, Int ) -> List ( Int, Int )
+buildJumpInfoStack source index length tmpStack retStack =
+    if index >= length then
+        retStack
+
+    else
+        case indexChar index source of
+            "[" ->
+                let
+                    newTmpStack =
+                        ( index, 0 ) :: tmpStack
+                in
+                buildJumpInfoStack source (index + 1) length newTmpStack retStack
+
+            "]" ->
+                let
+                    newHead =
+                        List.head tmpStack
+                            |> Maybe.map (\t -> ( Tuple.first t, index ))
+
+                    newRetStack =
+                        Maybe.map (\t -> t :: retStack) newHead
+                            |> Maybe.withDefault []
+                in
+                buildJumpInfoStack source (index + 1) length (List.drop 1 tmpStack) newRetStack
+
+            _ ->
+                buildJumpInfoStack source (index + 1) length tmpStack retStack
+
+
 start : Model -> Model
 start model =
+    let
+        source =
+            .inputAreaText model
+    in
     { model
         | memory = initMemory
         , pointer = initPointer
         , currentStep = initCurrentStep
-        , source = .inputAreaText model
+        , source = source
         , output = ""
+        , jumpInfo = buildJumpInfo source
     }
 
 
@@ -139,10 +186,36 @@ step model =
             model
 
         JumpForward ->
-            model
+            case Array.get cp cm of
+                Just 0 ->
+                    { model
+                        | currentStep = searchForwardJumpPosition cs (.jumpInfo model)
+                    }
+
+                _ ->
+                    { model
+                        | currentStep = cs
+                    }
 
         JumpBack ->
-            model
+            { model
+                | currentStep = searchPreviousJumpPosition cs (.jumpInfo model)
+            }
+
+
+searchForwardJumpPosition : Int -> List ( Int, Int ) -> Int
+searchForwardJumpPosition current jumpList =
+    List.Extra.find (\t -> Tuple.first t == current) jumpList
+        |> Maybe.map Tuple.second
+        |> Maybe.map ((+) 1)
+        |> Maybe.withDefault 0
+
+
+searchPreviousJumpPosition : Int -> List ( Int, Int ) -> Int
+searchPreviousJumpPosition current jumpList =
+    List.Extra.find (\t -> Tuple.second t == current) jumpList
+        |> Maybe.map Tuple.first
+        |> Maybe.withDefault 0
 
 
 incrementArrayValue : Int -> Array.Array Int -> Array.Array Int
