@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Array
+import Array.Extra
 import Browser
 import Dict
 import Html exposing (Html, button, div, span, text, textarea)
@@ -222,22 +223,12 @@ searchPreviousJumpPosition current jumpList =
 
 incrementArrayValue : Int -> Memory -> Memory
 incrementArrayValue index array =
-    case Array.get index array of
-        Just v ->
-            Array.set index (v + 1) array
-
-        Nothing ->
-            array
+    Array.Extra.update index ((+) 1) array
 
 
 decrementArrayValue : Int -> Memory -> Memory
 decrementArrayValue index array =
-    case Array.get index array of
-        Just v ->
-            Array.set index (v - 1) array
-
-        Nothing ->
-            array
+    Array.Extra.update index (\n -> n - 1) array
 
 
 outputPointerByteString : Int -> Memory -> String
