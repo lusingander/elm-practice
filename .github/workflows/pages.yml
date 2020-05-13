@@ -46,8 +46,23 @@ jobs:
 
       - name: Move files
         run: |
+          mv ./brainfuck/src/ ./brainfuck/elm.json ./
+
+      - name: Make
+        run: elm make src/Main.elm
+
+      - name: Rename files
+        run: |
+          mv ./index.html ./brainfuck.html
+
+      - name: Remove files
+        run: |
+          rm -rf ./src elm.json ./elm-stuff
+
+      - name: Move files
+        run: |
           mkdir ./public
-          mv ./concentration.html ./breakout.html ./public/
+          mv ./concentration.html ./breakout.html ./brainfuck.html ./public/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
