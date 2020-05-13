@@ -184,6 +184,7 @@ step model =
             }
 
         Input ->
+            -- Not implemented
             model
 
         JumpForward ->
