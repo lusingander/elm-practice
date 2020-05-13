@@ -90,7 +90,7 @@ buildJumpInfo source =
     buildJumpInfoStack source 0 (String.length source) [] []
 
 
-buildJumpInfoStack : String -> Int -> Int -> List ( Int, Int ) -> List ( Int, Int ) -> List ( Int, Int )
+buildJumpInfoStack : String -> Int -> Int -> JumpInfo -> JumpInfo -> JumpInfo
 buildJumpInfoStack source index length tmpStack retStack =
     if index >= length then
         retStack
@@ -204,7 +204,7 @@ step model =
             }
 
 
-searchForwardJumpPosition : Int -> List ( Int, Int ) -> Int
+searchForwardJumpPosition : Int -> JumpInfo -> Int
 searchForwardJumpPosition current jumpList =
     List.Extra.find (\t -> Tuple.first t == current) jumpList
         |> Maybe.map Tuple.second
@@ -212,14 +212,14 @@ searchForwardJumpPosition current jumpList =
         |> Maybe.withDefault 0
 
 
-searchPreviousJumpPosition : Int -> List ( Int, Int ) -> Int
+searchPreviousJumpPosition : Int -> JumpInfo -> Int
 searchPreviousJumpPosition current jumpList =
     List.Extra.find (\t -> Tuple.second t == current) jumpList
         |> Maybe.map Tuple.first
         |> Maybe.withDefault 0
 
 
-incrementArrayValue : Int -> Array.Array Int -> Array.Array Int
+incrementArrayValue : Int -> Memory -> Memory
 incrementArrayValue index array =
     case Array.get index array of
         Just v ->
@@ -229,7 +229,7 @@ incrementArrayValue index array =
             array
 
 
-decrementArrayValue : Int -> Array.Array Int -> Array.Array Int
+decrementArrayValue : Int -> Memory -> Memory
 decrementArrayValue index array =
     case Array.get index array of
         Just v ->
@@ -239,7 +239,7 @@ decrementArrayValue index array =
             array
 
 
-outputPointerByteString : Int -> Array.Array Int -> String
+outputPointerByteString : Int -> Memory -> String
 outputPointerByteString index array =
     Array.get index array
         |> Maybe.andThen ascii
