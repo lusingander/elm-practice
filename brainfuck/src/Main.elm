@@ -141,7 +141,6 @@ step : Model -> Model
 step model =
     let
         cs =
-            -- .currentStep model + 1
             .currentStep model
 
         cp =
