@@ -28,6 +28,7 @@ type alias Model =
     , source : String
     , output : String
     , jumpInfo : JumpInfo
+    , status : ExecutionStatus
     }
 
 
@@ -54,6 +55,12 @@ type alias JumpInfo =
     List ( Int, Int )
 
 
+type ExecutionStatus
+    = Default
+    | Executing
+    | End
+
+
 init : Model
 init =
     initModel
@@ -68,6 +75,7 @@ initModel =
     , source = ""
     , output = ""
     , jumpInfo = []
+    , status = Default
     }
 
 
@@ -134,6 +142,7 @@ start model =
         , source = source
         , output = ""
         , jumpInfo = buildJumpInfo source
+        , status = Executing
     }
 
 
@@ -200,7 +209,7 @@ incrementCurrentStep model =
             { model | currentStep = .currentStep model + 1 }
     in
     if eof updated then
-        updated
+        { model | status = End }
 
     else if currentIsValidChar updated then
         updated
@@ -320,6 +329,7 @@ update msg model =
                 | inputAreaText = input
                 , output = ""
                 , source = ""
+                , status = Default
             }
 
 
@@ -331,6 +341,7 @@ view model =
         , viewInputArea
         , viewOutputArea (.output model)
         , viewShowArea (.source model) (.currentStep model)
+        , viewDebugStates model
         ]
 
 
@@ -426,6 +437,29 @@ viewOutputArea output =
     div []
         [ text <| "Output: " ++ output
         ]
+
+
+viewDebugStates : Model -> Html Msg
+viewDebugStates model =
+    div []
+        [ div []
+            [ text <| "Current Step: " ++ (String.fromInt <| .currentStep model) ]
+        , div []
+            [ text <| "Current State: " ++ (executionStatusToString <| .status model) ]
+        ]
+
+
+executionStatusToString : ExecutionStatus -> String
+executionStatusToString status =
+    case status of
+        Default ->
+            "Default"
+
+        Executing ->
+            "Executing"
+
+        End ->
+            "End"
 
 
 ascii : Int -> Maybe String
