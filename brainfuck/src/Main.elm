@@ -154,34 +154,24 @@ step model =
     in
     case command of
         IncrementPointer ->
-            { model
-                | currentStep = cs + 1
-                , pointer = cp + 1
-            }
+            { model | pointer = cp + 1 }
+                |> incrementCurrentStep
 
         DecrementPointer ->
-            { model
-                | currentStep = cs + 1
-                , pointer = cp - 1
-            }
+            { model | pointer = cp - 1 }
+                |> incrementCurrentStep
 
         IncrementValue ->
-            { model
-                | currentStep = cs + 1
-                , memory = incrementArrayValue cp cm
-            }
+            { model | memory = incrementArrayValue cp cm }
+                |> incrementCurrentStep
 
         DecrementValue ->
-            { model
-                | currentStep = cs + 1
-                , memory = decrementArrayValue cp cm
-            }
+            { model | memory = decrementArrayValue cp cm }
+                |> incrementCurrentStep
 
         Output ->
-            { model
-                | currentStep = cs + 1
-                , output = .output model ++ outputPointerByteString cp cm
-            }
+            { model | output = .output model ++ outputPointerByteString cp cm }
+                |> incrementCurrentStep
 
         Input ->
             -- Not implemented
@@ -195,14 +185,25 @@ step model =
                     }
 
                 _ ->
-                    { model
-                        | currentStep = cs + 1
-                    }
+                    incrementCurrentStep model
 
         JumpBack ->
             { model
                 | currentStep = searchPreviousJumpPosition cs (.jumpInfo model)
             }
+
+
+incrementCurrentStep : Model -> Model
+incrementCurrentStep model =
+    let
+        updated =
+            { model | currentStep = .currentStep model + 1 }
+    in
+    if currentIsValidChar updated then
+        updated
+
+    else
+        incrementCurrentStep updated
 
 
 searchForwardJumpPosition : Int -> JumpInfo -> Int
@@ -248,6 +249,19 @@ currentCommand currentStep model =
 indexChar : Int -> String -> String
 indexChar index str =
     String.dropLeft index str |> String.left 1
+
+
+currentIsValidChar : Model -> Bool
+currentIsValidChar model =
+    .source model
+        |> String.dropLeft (.currentStep model)
+        |> String.left 1
+        |> isValidChar
+
+
+isValidChar : String -> Bool
+isValidChar str =
+    List.member str [ ">", "<", "+", "-", ".", ",", "[", "]" ]
 
 
 stringToCommand : String -> Command
