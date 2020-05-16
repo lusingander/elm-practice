@@ -96,12 +96,12 @@ initCurrentStep =
 
 buildJumpInfo : String -> JumpInfo
 buildJumpInfo source =
-    buildJumpInfoStack source 0 (String.length source) [] []
+    buildJumpInfoStack source 0 [] []
 
 
-buildJumpInfoStack : String -> Int -> Int -> JumpInfo -> JumpInfo -> JumpInfo
-buildJumpInfoStack source index length tmpStack retStack =
-    if index >= length then
+buildJumpInfoStack : String -> Int -> JumpInfo -> JumpInfo -> JumpInfo
+buildJumpInfoStack source index tmpStack retStack =
+    if index >= String.length source then
         retStack
 
     else
@@ -111,7 +111,7 @@ buildJumpInfoStack source index length tmpStack retStack =
                     newTmpStack =
                         ( index, 0 ) :: tmpStack
                 in
-                buildJumpInfoStack source (index + 1) length newTmpStack retStack
+                buildJumpInfoStack source (index + 1) newTmpStack retStack
 
             "]" ->
                 let
@@ -123,10 +123,10 @@ buildJumpInfoStack source index length tmpStack retStack =
                         Maybe.map (\t -> t :: retStack) newHead
                             |> Maybe.withDefault []
                 in
-                buildJumpInfoStack source (index + 1) length (List.drop 1 tmpStack) newRetStack
+                buildJumpInfoStack source (index + 1) (List.drop 1 tmpStack) newRetStack
 
             _ ->
-                buildJumpInfoStack source (index + 1) length tmpStack retStack
+                buildJumpInfoStack source (index + 1) tmpStack retStack
 
 
 start : Model -> Model
@@ -239,13 +239,13 @@ searchPreviousJumpPosition current jumpList =
 
 
 incrementArrayValue : Int -> Memory -> Memory
-incrementArrayValue index array =
-    Array.Extra.update index ((+) 1) array
+incrementArrayValue index =
+    Array.Extra.update index ((+) 1)
 
 
 decrementArrayValue : Int -> Memory -> Memory
-decrementArrayValue index array =
-    Array.Extra.update index (\n -> n - 1) array
+decrementArrayValue index =
+    Array.Extra.update index (\n -> n - 1)
 
 
 outputPointerByteString : Int -> Memory -> String
