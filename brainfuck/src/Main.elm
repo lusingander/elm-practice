@@ -199,11 +199,19 @@ incrementCurrentStep model =
         updated =
             { model | currentStep = .currentStep model + 1 }
     in
-    if currentIsValidChar updated then
+    if eof updated then
+        updated
+
+    else if currentIsValidChar updated then
         updated
 
     else
         incrementCurrentStep updated
+
+
+eof : Model -> Bool
+eof model =
+    (String.length <| .source model) < .currentStep model
 
 
 searchForwardJumpPosition : Int -> JumpInfo -> Int
