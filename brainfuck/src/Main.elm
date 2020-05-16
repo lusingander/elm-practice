@@ -256,11 +256,8 @@ outputPointerByteString index array =
 
 
 currentCommand : Int -> Model -> Command
-currentCommand currentStep model =
-    .source model
-        |> String.dropLeft currentStep
-        |> String.left 1
-        |> stringToCommand
+currentCommand currentStep =
+    stringToCommand << indexChar currentStep << .source
 
 
 indexChar : Int -> String -> String
@@ -271,8 +268,7 @@ indexChar index str =
 currentIsValidChar : Model -> Bool
 currentIsValidChar model =
     .source model
-        |> String.dropLeft (.currentStep model)
-        |> String.left 1
+        |> indexChar (.currentStep model)
         |> isValidChar
 
 
