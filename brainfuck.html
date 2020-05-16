@@ -5289,11 +5289,13 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Main$buildJumpInfoStack = F5(
-	function (source, index, length, tmpStack, retStack) {
+var $author$project$Main$buildJumpInfoStack = F4(
+	function (source, index, tmpStack, retStack) {
 		buildJumpInfoStack:
 		while (true) {
-			if (_Utils_cmp(index, length) > -1) {
+			if (_Utils_cmp(
+				index,
+				$elm$core$String$length(source)) > -1) {
 				return retStack;
 			} else {
 				var _v0 = A2($author$project$Main$indexChar, index, source);
@@ -5305,12 +5307,10 @@ var $author$project$Main$buildJumpInfoStack = F5(
 							tmpStack);
 						var $temp$source = source,
 							$temp$index = index + 1,
-							$temp$length = length,
 							$temp$tmpStack = newTmpStack,
 							$temp$retStack = retStack;
 						source = $temp$source;
 						index = $temp$index;
-						length = $temp$length;
 						tmpStack = $temp$tmpStack;
 						retStack = $temp$retStack;
 						continue buildJumpInfoStack;
@@ -5332,24 +5332,20 @@ var $author$project$Main$buildJumpInfoStack = F5(
 								newHead));
 						var $temp$source = source,
 							$temp$index = index + 1,
-							$temp$length = length,
 							$temp$tmpStack = A2($elm$core$List$drop, 1, tmpStack),
 							$temp$retStack = newRetStack;
 						source = $temp$source;
 						index = $temp$index;
-						length = $temp$length;
 						tmpStack = $temp$tmpStack;
 						retStack = $temp$retStack;
 						continue buildJumpInfoStack;
 					default:
 						var $temp$source = source,
 							$temp$index = index + 1,
-							$temp$length = length,
 							$temp$tmpStack = tmpStack,
 							$temp$retStack = retStack;
 						source = $temp$source;
 						index = $temp$index;
-						length = $temp$length;
 						tmpStack = $temp$tmpStack;
 						retStack = $temp$retStack;
 						continue buildJumpInfoStack;
@@ -5358,13 +5354,7 @@ var $author$project$Main$buildJumpInfoStack = F5(
 		}
 	});
 var $author$project$Main$buildJumpInfo = function (source) {
-	return A5(
-		$author$project$Main$buildJumpInfoStack,
-		source,
-		0,
-		$elm$core$String$length(source),
-		_List_Nil,
-		_List_Nil);
+	return A4($author$project$Main$buildJumpInfoStack, source, 0, _List_Nil, _List_Nil);
 };
 var $author$project$Main$start = function (model) {
 	var source = function ($) {
@@ -5382,6 +5372,11 @@ var $author$project$Main$start = function (model) {
 			status: $author$project$Main$Executing
 		});
 };
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
 var $author$project$Main$DecrementPointer = {$: 'DecrementPointer'};
 var $author$project$Main$DecrementValue = {$: 'DecrementValue'};
 var $author$project$Main$IncrementPointer = {$: 'IncrementPointer'};
@@ -5410,19 +5405,17 @@ var $author$project$Main$stringToCommand = function (s) {
 			return $author$project$Main$Input;
 	}
 };
-var $author$project$Main$currentCommand = F2(
-	function (currentStep, model) {
-		return $author$project$Main$stringToCommand(
-			A2(
-				$elm$core$String$left,
-				1,
-				A2(
-					$elm$core$String$dropLeft,
-					currentStep,
-					function ($) {
-						return $.source;
-					}(model))));
-	});
+var $author$project$Main$currentCommand = function (currentStep) {
+	return A2(
+		$elm$core$Basics$composeL,
+		A2(
+			$elm$core$Basics$composeL,
+			$author$project$Main$stringToCommand,
+			$author$project$Main$indexChar(currentStep)),
+		function ($) {
+			return $.source;
+		});
+};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -5521,24 +5514,20 @@ var $elm_community$array_extra$Array$Extra$update = F3(
 				a);
 		}
 	});
-var $author$project$Main$decrementArrayValue = F2(
-	function (index, array) {
-		return A3(
-			$elm_community$array_extra$Array$Extra$update,
-			index,
-			function (n) {
-				return n - 1;
-			},
-			array);
-	});
-var $author$project$Main$incrementArrayValue = F2(
-	function (index, array) {
-		return A3(
-			$elm_community$array_extra$Array$Extra$update,
-			index,
-			$elm$core$Basics$add(1),
-			array);
-	});
+var $author$project$Main$decrementArrayValue = function (index) {
+	return A2(
+		$elm_community$array_extra$Array$Extra$update,
+		index,
+		function (n) {
+			return n - 1;
+		});
+};
+var $author$project$Main$incrementArrayValue = function (index) {
+	return A2(
+		$elm_community$array_extra$Array$Extra$update,
+		index,
+		$elm$core$Basics$add(1));
+};
 var $author$project$Main$End = {$: 'End'};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -5580,16 +5569,13 @@ var $author$project$Main$isValidChar = function (str) {
 var $author$project$Main$currentIsValidChar = function (model) {
 	return $author$project$Main$isValidChar(
 		A2(
-			$elm$core$String$left,
-			1,
-			A2(
-				$elm$core$String$dropLeft,
-				function ($) {
-					return $.currentStep;
-				}(model),
-				function ($) {
-					return $.source;
-				}(model))));
+			$author$project$Main$indexChar,
+			function ($) {
+				return $.currentStep;
+			}(model),
+			function ($) {
+				return $.source;
+			}(model)));
 };
 var $author$project$Main$eof = function (model) {
 	return _Utils_cmp(
