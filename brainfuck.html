@@ -4486,6 +4486,7 @@ var $elm$core$Set$toList = function (_v0) {
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
+var $author$project$Main$Default = {$: 'Default'};
 var $author$project$Main$initCurrentStep = 0;
 var $elm$core$Array$branchFactor = 32;
 var $elm$core$Array$Array_elm_builtin = F4(
@@ -4670,7 +4671,7 @@ var $elm$core$Array$repeat = F2(
 	});
 var $author$project$Main$initMemory = A2($elm$core$Array$repeat, 20, 0);
 var $author$project$Main$initPointer = 0;
-var $author$project$Main$initModel = {currentStep: $author$project$Main$initCurrentStep, inputAreaText: '', jumpInfo: _List_Nil, memory: $author$project$Main$initMemory, output: '', pointer: $author$project$Main$initPointer, source: ''};
+var $author$project$Main$initModel = {currentStep: $author$project$Main$initCurrentStep, inputAreaText: '', jumpInfo: _List_Nil, memory: $author$project$Main$initMemory, output: '', pointer: $author$project$Main$initPointer, source: '', status: $author$project$Main$Default};
 var $author$project$Main$init = $author$project$Main$initModel;
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
@@ -5230,6 +5231,7 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $author$project$Main$Executing = {$: 'Executing'};
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -5376,7 +5378,8 @@ var $author$project$Main$start = function (model) {
 			memory: $author$project$Main$initMemory,
 			output: '',
 			pointer: $author$project$Main$initPointer,
-			source: source
+			source: source,
+			status: $author$project$Main$Executing
 		});
 };
 var $author$project$Main$DecrementPointer = {$: 'DecrementPointer'};
@@ -5536,6 +5539,93 @@ var $author$project$Main$incrementArrayValue = F2(
 			$elm$core$Basics$add(1),
 			array);
 	});
+var $author$project$Main$End = {$: 'End'};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Main$isValidChar = function (str) {
+	return A2(
+		$elm$core$List$member,
+		str,
+		_List_fromArray(
+			['>', '<', '+', '-', '.', ',', '[', ']']));
+};
+var $author$project$Main$currentIsValidChar = function (model) {
+	return $author$project$Main$isValidChar(
+		A2(
+			$elm$core$String$left,
+			1,
+			A2(
+				$elm$core$String$dropLeft,
+				function ($) {
+					return $.currentStep;
+				}(model),
+				function ($) {
+					return $.source;
+				}(model))));
+};
+var $author$project$Main$eof = function (model) {
+	return _Utils_cmp(
+		$elm$core$String$length(
+			function ($) {
+				return $.source;
+			}(model)),
+		function ($) {
+			return $.currentStep;
+		}(model)) < 0;
+};
+var $author$project$Main$incrementCurrentStep = function (model) {
+	incrementCurrentStep:
+	while (true) {
+		var updated = _Utils_update(
+			model,
+			{
+				currentStep: function ($) {
+					return $.currentStep;
+				}(model) + 1
+			});
+		if ($author$project$Main$eof(updated)) {
+			return _Utils_update(
+				model,
+				{status: $author$project$Main$End});
+		} else {
+			if ($author$project$Main$currentIsValidChar(updated)) {
+				return updated;
+			} else {
+				var $temp$model = updated;
+				model = $temp$model;
+				continue incrementCurrentStep;
+			}
+		}
+	}
+};
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -5886,38 +5976,40 @@ var $author$project$Main$step = function (model) {
 	}(model);
 	switch (command.$) {
 		case 'IncrementPointer':
-			return _Utils_update(
-				model,
-				{currentStep: cs + 1, pointer: cp + 1});
+			return $author$project$Main$incrementCurrentStep(
+				_Utils_update(
+					model,
+					{pointer: cp + 1}));
 		case 'DecrementPointer':
-			return _Utils_update(
-				model,
-				{currentStep: cs + 1, pointer: cp - 1});
+			return $author$project$Main$incrementCurrentStep(
+				_Utils_update(
+					model,
+					{pointer: cp - 1}));
 		case 'IncrementValue':
-			return _Utils_update(
-				model,
-				{
-					currentStep: cs + 1,
-					memory: A2($author$project$Main$incrementArrayValue, cp, cm)
-				});
+			return $author$project$Main$incrementCurrentStep(
+				_Utils_update(
+					model,
+					{
+						memory: A2($author$project$Main$incrementArrayValue, cp, cm)
+					}));
 		case 'DecrementValue':
-			return _Utils_update(
-				model,
-				{
-					currentStep: cs + 1,
-					memory: A2($author$project$Main$decrementArrayValue, cp, cm)
-				});
+			return $author$project$Main$incrementCurrentStep(
+				_Utils_update(
+					model,
+					{
+						memory: A2($author$project$Main$decrementArrayValue, cp, cm)
+					}));
 		case 'Output':
-			return _Utils_update(
-				model,
-				{
-					currentStep: cs + 1,
-					output: _Utils_ap(
-						function ($) {
-							return $.output;
-						}(model),
-						A2($author$project$Main$outputPointerByteString, cp, cm))
-				});
+			return $author$project$Main$incrementCurrentStep(
+				_Utils_update(
+					model,
+					{
+						output: _Utils_ap(
+							function ($) {
+								return $.output;
+							}(model),
+							A2($author$project$Main$outputPointerByteString, cp, cm))
+					}));
 		case 'Input':
 			return model;
 		case 'JumpForward':
@@ -5934,9 +6026,7 @@ var $author$project$Main$step = function (model) {
 							}(model))
 					});
 			} else {
-				return _Utils_update(
-					model,
-					{currentStep: cs + 1});
+				return $author$project$Main$incrementCurrentStep(model);
 			}
 		default:
 			return _Utils_update(
@@ -5962,12 +6052,54 @@ var $author$project$Main$update = F2(
 				var input = msg.a;
 				return _Utils_update(
 					model,
-					{inputAreaText: input, output: '', source: ''});
+					{inputAreaText: input, output: '', source: '', status: $author$project$Main$Default});
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Main$executionStatusToString = function (status) {
+	switch (status.$) {
+		case 'Default':
+			return 'Default';
+		case 'Executing':
+			return 'Executing';
+		default:
+			return 'End';
+	}
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$viewDebugStates = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Current Step: ' + $elm$core$String$fromInt(
+							function ($) {
+								return $.currentStep;
+							}(model)))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Current State: ' + $author$project$Main$executionStatusToString(
+							function ($) {
+								return $.status;
+							}(model)))
+					]))
+			]));
+};
 var $author$project$Main$InputAreaUpdate = function (a) {
 	return {$: 'InputAreaUpdate', a: a};
 };
@@ -6012,8 +6144,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$viewInputArea = A2(
 	$elm$html$Html$div,
@@ -6277,7 +6407,8 @@ var $author$project$Main$view = function (model) {
 				}(model),
 				function ($) {
 					return $.currentStep;
-				}(model))
+				}(model)),
+				$author$project$Main$viewDebugStates(model)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
