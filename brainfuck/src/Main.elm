@@ -190,7 +190,9 @@ step model =
             case Array.get cp cm of
                 Just 0 ->
                     { model
-                        | currentStep = searchForwardJumpPosition cs (.jumpInfo model)
+                        | currentStep =
+                            searchForwardJumpPosition cs (.jumpInfo model)
+                                |> getNextValidCharIndex (.source model)
                     }
 
                 _ ->
@@ -223,14 +225,18 @@ incrementCurrentStep model =
 
 eof : Model -> Bool
 eof model =
-    (String.length <| .source model) < .currentStep model
+    endOfSource (.currentStep model) (.source model)
+
+
+endOfSource : Int -> String -> Bool
+endOfSource current source =
+    String.length source < current
 
 
 searchForwardJumpPosition : Int -> JumpInfo -> Int
 searchForwardJumpPosition current jumpList =
     List.Extra.find (\t -> Tuple.first t == current) jumpList
         |> Maybe.map Tuple.second
-        |> Maybe.map ((+) 1)
         |> Maybe.withDefault 0
 
 
@@ -239,6 +245,22 @@ searchPreviousJumpPosition current jumpList =
     List.Extra.find (\t -> Tuple.second t == current) jumpList
         |> Maybe.map Tuple.first
         |> Maybe.withDefault 0
+
+
+getNextValidCharIndex : String -> Int -> Int
+getNextValidCharIndex source current =
+    let
+        next =
+            current + 1
+    in
+    if endOfSource next source then
+        next
+
+    else if indexIsValidChar next source then
+        next
+
+    else
+        getNextValidCharIndex source next
 
 
 incrementArrayValue : Int -> Memory -> Memory
@@ -270,9 +292,12 @@ indexChar index str =
 
 currentIsValidChar : Model -> Bool
 currentIsValidChar model =
-    .source model
-        |> indexChar (.currentStep model)
-        |> isValidChar
+    indexIsValidChar (.currentStep model) (.source model)
+
+
+indexIsValidChar : Int -> String -> Bool
+indexIsValidChar current =
+    isValidChar << indexChar current
 
 
 isValidChar : String -> Bool
