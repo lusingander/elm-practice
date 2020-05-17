@@ -5388,21 +5388,23 @@ var $author$project$Main$Output = {$: 'Output'};
 var $author$project$Main$stringToCommand = function (s) {
 	switch (s) {
 		case '>':
-			return $author$project$Main$IncrementPointer;
+			return $elm$core$Maybe$Just($author$project$Main$IncrementPointer);
 		case '<':
-			return $author$project$Main$DecrementPointer;
+			return $elm$core$Maybe$Just($author$project$Main$DecrementPointer);
 		case '+':
-			return $author$project$Main$IncrementValue;
+			return $elm$core$Maybe$Just($author$project$Main$IncrementValue);
 		case '-':
-			return $author$project$Main$DecrementValue;
+			return $elm$core$Maybe$Just($author$project$Main$DecrementValue);
 		case '.':
-			return $author$project$Main$Output;
+			return $elm$core$Maybe$Just($author$project$Main$Output);
+		case ',':
+			return $elm$core$Maybe$Just($author$project$Main$Input);
 		case '[':
-			return $author$project$Main$JumpForward;
+			return $elm$core$Maybe$Just($author$project$Main$JumpForward);
 		case ']':
-			return $author$project$Main$JumpBack;
+			return $elm$core$Maybe$Just($author$project$Main$JumpBack);
 		default:
-			return $author$project$Main$Input;
+			return $elm$core$Maybe$Nothing;
 	}
 };
 var $author$project$Main$currentCommand = function (currentStep) {
@@ -5960,71 +5962,83 @@ var $author$project$Main$step = function (model) {
 	var cm = function ($) {
 		return $.memory;
 	}(model);
-	switch (command.$) {
-		case 'IncrementPointer':
-			return $author$project$Main$incrementCurrentStep(
-				_Utils_update(
-					model,
-					{pointer: cp + 1}));
-		case 'DecrementPointer':
-			return $author$project$Main$incrementCurrentStep(
-				_Utils_update(
-					model,
-					{pointer: cp - 1}));
-		case 'IncrementValue':
-			return $author$project$Main$incrementCurrentStep(
-				_Utils_update(
-					model,
-					{
-						memory: A2($author$project$Main$incrementArrayValue, cp, cm)
-					}));
-		case 'DecrementValue':
-			return $author$project$Main$incrementCurrentStep(
-				_Utils_update(
-					model,
-					{
-						memory: A2($author$project$Main$decrementArrayValue, cp, cm)
-					}));
-		case 'Output':
-			return $author$project$Main$incrementCurrentStep(
-				_Utils_update(
-					model,
-					{
-						output: _Utils_ap(
-							function ($) {
-								return $.output;
-							}(model),
-							A2($author$project$Main$outputPointerByteString, cp, cm))
-					}));
-		case 'Input':
-			return model;
-		case 'JumpForward':
-			var _v1 = A2($elm$core$Array$get, cp, cm);
-			if ((_v1.$ === 'Just') && (!_v1.a)) {
+	if (command.$ === 'Just') {
+		switch (command.a.$) {
+			case 'IncrementPointer':
+				var _v1 = command.a;
+				return $author$project$Main$incrementCurrentStep(
+					_Utils_update(
+						model,
+						{pointer: cp + 1}));
+			case 'DecrementPointer':
+				var _v2 = command.a;
+				return $author$project$Main$incrementCurrentStep(
+					_Utils_update(
+						model,
+						{pointer: cp - 1}));
+			case 'IncrementValue':
+				var _v3 = command.a;
+				return $author$project$Main$incrementCurrentStep(
+					_Utils_update(
+						model,
+						{
+							memory: A2($author$project$Main$incrementArrayValue, cp, cm)
+						}));
+			case 'DecrementValue':
+				var _v4 = command.a;
+				return $author$project$Main$incrementCurrentStep(
+					_Utils_update(
+						model,
+						{
+							memory: A2($author$project$Main$decrementArrayValue, cp, cm)
+						}));
+			case 'Output':
+				var _v5 = command.a;
+				return $author$project$Main$incrementCurrentStep(
+					_Utils_update(
+						model,
+						{
+							output: _Utils_ap(
+								function ($) {
+									return $.output;
+								}(model),
+								A2($author$project$Main$outputPointerByteString, cp, cm))
+						}));
+			case 'Input':
+				var _v6 = command.a;
+				return model;
+			case 'JumpForward':
+				var _v7 = command.a;
+				var _v8 = A2($elm$core$Array$get, cp, cm);
+				if ((_v8.$ === 'Just') && (!_v8.a)) {
+					return _Utils_update(
+						model,
+						{
+							currentStep: A2(
+								$author$project$Main$searchForwardJumpPosition,
+								cs,
+								function ($) {
+									return $.jumpInfo;
+								}(model))
+						});
+				} else {
+					return $author$project$Main$incrementCurrentStep(model);
+				}
+			default:
+				var _v9 = command.a;
 				return _Utils_update(
 					model,
 					{
 						currentStep: A2(
-							$author$project$Main$searchForwardJumpPosition,
+							$author$project$Main$searchPreviousJumpPosition,
 							cs,
 							function ($) {
 								return $.jumpInfo;
 							}(model))
 					});
-			} else {
-				return $author$project$Main$incrementCurrentStep(model);
-			}
-		default:
-			return _Utils_update(
-				model,
-				{
-					currentStep: A2(
-						$author$project$Main$searchPreviousJumpPosition,
-						cs,
-						function ($) {
-							return $.jumpInfo;
-						}(model))
-				});
+		}
+	} else {
+		return model;
 	}
 };
 var $author$project$Main$update = F2(
