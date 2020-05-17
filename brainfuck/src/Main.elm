@@ -162,31 +162,31 @@ step model =
             currentCommand cs model
     in
     case command of
-        IncrementPointer ->
+        Just IncrementPointer ->
             { model | pointer = cp + 1 }
                 |> incrementCurrentStep
 
-        DecrementPointer ->
+        Just DecrementPointer ->
             { model | pointer = cp - 1 }
                 |> incrementCurrentStep
 
-        IncrementValue ->
+        Just IncrementValue ->
             { model | memory = incrementArrayValue cp cm }
                 |> incrementCurrentStep
 
-        DecrementValue ->
+        Just DecrementValue ->
             { model | memory = decrementArrayValue cp cm }
                 |> incrementCurrentStep
 
-        Output ->
+        Just Output ->
             { model | output = .output model ++ outputPointerByteString cp cm }
                 |> incrementCurrentStep
 
-        Input ->
+        Just Input ->
             -- Not implemented
             model
 
-        JumpForward ->
+        Just JumpForward ->
             case Array.get cp cm of
                 Just 0 ->
                     { model
@@ -196,10 +196,13 @@ step model =
                 _ ->
                     incrementCurrentStep model
 
-        JumpBack ->
+        Just JumpBack ->
             { model
                 | currentStep = searchPreviousJumpPosition cs (.jumpInfo model)
             }
+
+        Nothing ->
+            model
 
 
 incrementCurrentStep : Model -> Model
@@ -255,7 +258,7 @@ outputPointerByteString index array =
         |> Maybe.withDefault ""
 
 
-currentCommand : Int -> Model -> Command
+currentCommand : Int -> Model -> Maybe Command
 currentCommand currentStep =
     stringToCommand << indexChar currentStep << .source
 
@@ -277,32 +280,35 @@ isValidChar str =
     List.member str [ ">", "<", "+", "-", ".", ",", "[", "]" ]
 
 
-stringToCommand : String -> Command
+stringToCommand : String -> Maybe Command
 stringToCommand s =
     case s of
         ">" ->
-            IncrementPointer
+            Just IncrementPointer
 
         "<" ->
-            DecrementPointer
+            Just DecrementPointer
 
         "+" ->
-            IncrementValue
+            Just IncrementValue
 
         "-" ->
-            DecrementValue
+            Just DecrementValue
 
         "." ->
-            Output
+            Just Output
+
+        "," ->
+            Just Input
 
         "[" ->
-            JumpForward
+            Just JumpForward
 
         "]" ->
-            JumpBack
+            Just JumpBack
 
         _ ->
-            Input
+            Nothing
 
 
 type Msg
