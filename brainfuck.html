@@ -5524,13 +5524,12 @@ var $author$project$Main$decrementArrayValue = function (index) {
 			return n - 1;
 		});
 };
-var $author$project$Main$incrementArrayValue = function (index) {
-	return A2(
-		$elm_community$array_extra$Array$Extra$update,
-		index,
-		$elm$core$Basics$add(1));
-};
-var $author$project$Main$End = {$: 'End'};
+var $author$project$Main$endOfSource = F2(
+	function (current, source) {
+		return _Utils_cmp(
+			$elm$core$String$length(source),
+			current) < 0;
+	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5568,26 +5567,58 @@ var $author$project$Main$isValidChar = function (str) {
 		_List_fromArray(
 			['>', '<', '+', '-', '.', ',', '[', ']']));
 };
-var $author$project$Main$currentIsValidChar = function (model) {
-	return $author$project$Main$isValidChar(
-		A2(
-			$author$project$Main$indexChar,
-			function ($) {
-				return $.currentStep;
-			}(model),
-			function ($) {
-				return $.source;
-			}(model)));
+var $author$project$Main$indexIsValidChar = function (current) {
+	return A2(
+		$elm$core$Basics$composeL,
+		$author$project$Main$isValidChar,
+		$author$project$Main$indexChar(current));
 };
-var $author$project$Main$eof = function (model) {
-	return _Utils_cmp(
-		$elm$core$String$length(
-			function ($) {
-				return $.source;
-			}(model)),
+var $author$project$Main$getNextValidCharIndex = F2(
+	function (source, current) {
+		getNextValidCharIndex:
+		while (true) {
+			var next = current + 1;
+			if (A2($author$project$Main$endOfSource, next, source)) {
+				return next;
+			} else {
+				if (A2($author$project$Main$indexIsValidChar, next, source)) {
+					return next;
+				} else {
+					var $temp$source = source,
+						$temp$current = next;
+					source = $temp$source;
+					current = $temp$current;
+					continue getNextValidCharIndex;
+				}
+			}
+		}
+	});
+var $author$project$Main$incrementArrayValue = function (index) {
+	return A2(
+		$elm_community$array_extra$Array$Extra$update,
+		index,
+		$elm$core$Basics$add(1));
+};
+var $author$project$Main$End = {$: 'End'};
+var $author$project$Main$currentIsValidChar = function (model) {
+	return A2(
+		$author$project$Main$indexIsValidChar,
 		function ($) {
 			return $.currentStep;
-		}(model)) < 0;
+		}(model),
+		function ($) {
+			return $.source;
+		}(model));
+};
+var $author$project$Main$eof = function (model) {
+	return A2(
+		$author$project$Main$endOfSource,
+		function ($) {
+			return $.currentStep;
+		}(model),
+		function ($) {
+			return $.source;
+		}(model));
 };
 var $author$project$Main$incrementCurrentStep = function (model) {
 	incrementCurrentStep:
@@ -5925,16 +5956,13 @@ var $author$project$Main$searchForwardJumpPosition = F2(
 			0,
 			A2(
 				$elm$core$Maybe$map,
-				$elm$core$Basics$add(1),
+				$elm$core$Tuple$second,
 				A2(
-					$elm$core$Maybe$map,
-					$elm$core$Tuple$second,
-					A2(
-						$elm_community$list_extra$List$Extra$find,
-						function (t) {
-							return _Utils_eq(t.a, current);
-						},
-						jumpList))));
+					$elm_community$list_extra$List$Extra$find,
+					function (t) {
+						return _Utils_eq(t.a, current);
+					},
+					jumpList)));
 	});
 var $author$project$Main$searchPreviousJumpPosition = F2(
 	function (current, jumpList) {
@@ -6015,11 +6043,16 @@ var $author$project$Main$step = function (model) {
 						model,
 						{
 							currentStep: A2(
-								$author$project$Main$searchForwardJumpPosition,
-								cs,
+								$author$project$Main$getNextValidCharIndex,
 								function ($) {
-									return $.jumpInfo;
-								}(model))
+									return $.source;
+								}(model),
+								A2(
+									$author$project$Main$searchForwardJumpPosition,
+									cs,
+									function ($) {
+										return $.jumpInfo;
+									}(model)))
 						});
 				} else {
 					return $author$project$Main$incrementCurrentStep(model);
