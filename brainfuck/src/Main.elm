@@ -4,7 +4,7 @@ import Array
 import Array.Extra
 import Browser
 import Dict
-import Html exposing (Html, button, div, span, text, textarea)
+import Html exposing (Html, button, code, div, pre, span, text, textarea)
 import Html.Attributes exposing (disabled, style)
 import Html.Events exposing (onClick, onInput)
 import List.Extra
@@ -433,19 +433,18 @@ viewShowArea input current =
     in
     div []
         [ div [] [ text "Visual:" ]
-        , div
-            (inputAreaStyles
-                ++ [ style "border" "1px solid"
-                   , style "word-break" "break-all"
-                   , disabled True
-                   ]
-            )
-            [ span [] [ text prevString ]
-            , span
-                [ style "color" "red"
+        , pre
+            [ style "border" "1px solid"
+            ]
+            [ code
+                inputAreaStyles
+                [ span [] [ text prevString ]
+                , span
+                    [ style "color" "red"
+                    ]
+                    [ text currentChar ]
+                , span [] [ text forwardString ]
                 ]
-                [ text currentChar ]
-            , span [] [ text forwardString ]
             ]
         ]
 
