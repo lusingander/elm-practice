@@ -5,7 +5,7 @@ import Array.Extra
 import Browser
 import Dict
 import Html exposing (Html, button, code, div, pre, span, text, textarea)
-import Html.Attributes exposing (disabled, style)
+import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onInput)
 import List.Extra
 import String exposing (fromInt)
