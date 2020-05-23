@@ -6209,15 +6209,8 @@ var $author$project$Main$viewOutputArea = function (output) {
 				$elm$html$Html$text('Output: ' + output)
 			]));
 };
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$html$Html$code = _VirtualDom_node('code');
+var $elm$html$Html$pre = _VirtualDom_node('pre');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$viewShowArea = F2(
 	function (input, current) {
@@ -6241,40 +6234,42 @@ var $author$project$Main$viewShowArea = F2(
 							$elm$html$Html$text('Visual:')
 						])),
 					A2(
-					$elm$html$Html$div,
-					_Utils_ap(
-						$author$project$Main$inputAreaStyles,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'border', '1px solid'),
-								A2($elm$html$Html$Attributes$style, 'word-break', 'break-all'),
-								$elm$html$Html$Attributes$disabled(true)
-							])),
+					$elm$html$Html$pre,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'border', '1px solid')
+						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$span,
-							_List_Nil,
+							$elm$html$Html$code,
+							$author$project$Main$inputAreaStyles,
 							_List_fromArray(
 								[
-									$elm$html$Html$text(prevString)
-								])),
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'color', 'red')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(currentChar)
-								])),
-							A2(
-							$elm$html$Html$span,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(forwardString)
+									A2(
+									$elm$html$Html$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(prevString)
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'color', 'red')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(currentChar)
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(forwardString)
+										]))
 								]))
 						]))
 				]));
