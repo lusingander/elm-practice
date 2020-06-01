@@ -60,6 +60,7 @@ type alias JumpInfo =
 type ExecutionStatus
     = Default
     | Executing
+    | AutoPlaying
     | End
 
 
@@ -345,6 +346,8 @@ type Msg
     | StepNext
     | InputAreaUpdate String
     | Tick
+    | Play
+    | Pause
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -371,8 +374,34 @@ update msg model =
             )
 
         Tick ->
-            if .status model == Executing then
+            if .status model == AutoPlaying then
                 ( step model
+                , Cmd.none
+                )
+
+            else
+                ( model
+                , Cmd.none
+                )
+
+        Play ->
+            if .status model == Executing then
+                ( { model
+                    | status = AutoPlaying
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( model
+                , Cmd.none
+                )
+
+        Pause ->
+            if .status model == AutoPlaying then
+                ( { model
+                    | status = Executing
+                  }
                 , Cmd.none
                 )
 
@@ -384,14 +413,18 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every 100 (\_ -> Tick)
+    if .status model == AutoPlaying then
+        Time.every 100 (\_ -> Tick)
+
+    else
+        Sub.none
 
 
 view : Model -> Html Msg
 view model =
     div
         [ style "margin" "30px" ]
-        [ viewStatus (.memory model) (.pointer model)
+        [ viewStatus (.memory model) (.pointer model) (.status model)
         , viewInputArea
         , viewOutputArea (.output model)
         , viewShowArea (.source model) (.currentStep model)
@@ -399,14 +432,24 @@ view model =
         ]
 
 
-viewStatus : Memory -> Pointer -> Html Msg
-viewStatus memory pointer =
+viewStatus : Memory -> Pointer -> ExecutionStatus -> Html Msg
+viewStatus memory pointer status =
     div []
         [ viewMemory memory pointer
         , div [] [ text <| "pointer: " ++ fromInt pointer ]
         , button [ onClick Start ] [ text "Start" ]
         , button [ onClick StepNext ] [ text "Next" ]
+        , viewPlayButton status
         ]
+
+
+viewPlayButton : ExecutionStatus -> Html Msg
+viewPlayButton status =
+    if status == AutoPlaying then
+        button [ onClick Pause ] [ text "Pause" ]
+
+    else
+        button [ onClick Play ] [ text "Play" ]
 
 
 viewMemory : Memory -> Pointer -> Html Msg
@@ -510,6 +553,9 @@ executionStatusToString status =
 
         Executing ->
             "Executing"
+
+        AutoPlaying ->
+            "AutoPlaying"
 
         End ->
             "End"
