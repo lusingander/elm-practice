@@ -9,14 +9,16 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick, onInput)
 import List.Extra
 import String exposing (fromInt)
+import Time
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
+    Browser.element
         { init = init
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }
 
 
@@ -61,9 +63,11 @@ type ExecutionStatus
     | End
 
 
-init : Model
-init =
-    initModel
+init : () -> ( Model, Cmd msg )
+init _ =
+    ( initModel
+    , Cmd.none
+    )
 
 
 initModel : Model
@@ -340,24 +344,47 @@ type Msg
     = Start
     | StepNext
     | InputAreaUpdate String
+    | Tick
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Start ->
-            start model
+            ( start model
+            , Cmd.none
+            )
 
         StepNext ->
-            step model
+            ( step model
+            , Cmd.none
+            )
 
         InputAreaUpdate input ->
-            { model
+            ( { model
                 | inputAreaText = input
                 , output = ""
                 , source = ""
                 , status = Default
-            }
+              }
+            , Cmd.none
+            )
+
+        Tick ->
+            if .status model == Executing then
+                ( step model
+                , Cmd.none
+                )
+
+            else
+                ( model
+                , Cmd.none
+                )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Time.every 100 (\_ -> Tick)
 
 
 view : Model -> Html Msg
