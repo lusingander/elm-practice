@@ -4,9 +4,11 @@ import Array
 import Array.Extra
 import Browser
 import Dict
-import Html exposing (Html, button, code, div, pre, span, text, textarea)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick, onInput)
+import Example
+import Html exposing (Html, button, code, div, option, pre, select, span, text, textarea)
+import Html.Attributes exposing (style, value)
+import Html.Events exposing (on, onClick, onInput)
+import Json.Decode
 import List.Extra
 import String exposing (fromInt)
 import Time
@@ -348,6 +350,7 @@ type Msg
     | Tick
     | Play
     | Pause
+    | ExampleSelectChange String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -410,6 +413,9 @@ update msg model =
                 , Cmd.none
                 )
 
+        ExampleSelectChange select ->
+            update (InputAreaUpdate <| Example.getExampleString select) model
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -424,12 +430,33 @@ view : Model -> Html Msg
 view model =
     div
         [ style "margin" "30px" ]
-        [ viewStatus (.memory model) (.pointer model) (.status model)
-        , viewInputArea
+        [ viewExampleSelect
+        , viewStatus (.memory model) (.pointer model) (.status model)
+        , viewInputArea (.inputAreaText model)
         , viewOutputArea (.output model)
         , viewShowArea (.source model) (.currentStep model)
         , viewDebugStates model
         ]
+
+
+onChange : (String -> msg) -> Html.Attribute msg
+onChange handler =
+    on "change" (Json.Decode.map handler Html.Events.targetValue)
+
+
+viewExampleSelect : Html Msg
+viewExampleSelect =
+    let
+        handler selected =
+            ExampleSelectChange selected
+    in
+    select
+        [ onChange handler
+        ]
+        (List.map
+            (\( v, t ) -> option [ value v ] [ text t ])
+            Example.examples
+        )
 
 
 viewStatus : Memory -> Pointer -> ExecutionStatus -> Html Msg
@@ -475,13 +502,14 @@ viewSingleMemory current n =
         [ text <| fromInt n ]
 
 
-viewInputArea : Html Msg
-viewInputArea =
+viewInputArea : String -> Html Msg
+viewInputArea input =
     div []
         [ div [] [ text "Input:" ]
         , textarea
             (inputAreaStyles
                 ++ [ onInput InputAreaUpdate
+                   , value input
                    ]
             )
             []

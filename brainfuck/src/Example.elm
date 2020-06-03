@@ -1,6 +1,23 @@
-module Example exposing (simpleHelloWorld)
+module Example exposing (examples, getExampleString)
 
 import String
+
+
+examples : List ( String, String )
+examples =
+    [ ( "", "-" )
+    , ( "simple", "Simple Hello World" )
+    ]
+
+
+getExampleString : String -> String
+getExampleString value =
+    case value of
+        "simple" ->
+            simpleHelloWorld
+
+        _ ->
+            ""
 
 
 
