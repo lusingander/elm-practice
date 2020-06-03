@@ -5692,6 +5692,18 @@ var $author$project$Main$subscriptions = function (model) {
 		}) : $elm$core$Platform$Sub$none;
 };
 var $author$project$Main$Executing = {$: 'Executing'};
+var $author$project$Main$InputAreaUpdate = function (a) {
+	return {$: 'InputAreaUpdate', a: a};
+};
+var $elm$core$String$trim = _String_trim;
+var $author$project$Example$simpleHelloWorld = $elm$core$String$trim('\n++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.\n');
+var $author$project$Example$getExampleString = function (value) {
+	if (value === 'simple') {
+		return $author$project$Example$simpleHelloWorld;
+	} else {
+		return '';
+	}
+};
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -6389,50 +6401,61 @@ var $author$project$Main$step = function (model) {
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'Start':
-				return _Utils_Tuple2(
-					$author$project$Main$start(model),
-					$elm$core$Platform$Cmd$none);
-			case 'StepNext':
-				return _Utils_Tuple2(
-					$author$project$Main$step(model),
-					$elm$core$Platform$Cmd$none);
-			case 'InputAreaUpdate':
-				var input = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{inputAreaText: input, output: '', source: '', status: $author$project$Main$Default}),
-					$elm$core$Platform$Cmd$none);
-			case 'Tick':
-				return _Utils_eq(
-					function ($) {
-						return $.status;
-					}(model),
-					$author$project$Main$AutoPlaying) ? _Utils_Tuple2(
-					$author$project$Main$step(model),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'Play':
-				return _Utils_eq(
-					function ($) {
-						return $.status;
-					}(model),
-					$author$project$Main$Executing) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{status: $author$project$Main$AutoPlaying}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_eq(
-					function ($) {
-						return $.status;
-					}(model),
-					$author$project$Main$AutoPlaying) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{status: $author$project$Main$Executing}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		update:
+		while (true) {
+			switch (msg.$) {
+				case 'Start':
+					return _Utils_Tuple2(
+						$author$project$Main$start(model),
+						$elm$core$Platform$Cmd$none);
+				case 'StepNext':
+					return _Utils_Tuple2(
+						$author$project$Main$step(model),
+						$elm$core$Platform$Cmd$none);
+				case 'InputAreaUpdate':
+					var input = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{inputAreaText: input, output: '', source: '', status: $author$project$Main$Default}),
+						$elm$core$Platform$Cmd$none);
+				case 'Tick':
+					return _Utils_eq(
+						function ($) {
+							return $.status;
+						}(model),
+						$author$project$Main$AutoPlaying) ? _Utils_Tuple2(
+						$author$project$Main$step(model),
+						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'Play':
+					return _Utils_eq(
+						function ($) {
+							return $.status;
+						}(model),
+						$author$project$Main$Executing) ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{status: $author$project$Main$AutoPlaying}),
+						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'Pause':
+					return _Utils_eq(
+						function ($) {
+							return $.status;
+						}(model),
+						$author$project$Main$AutoPlaying) ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{status: $author$project$Main$Executing}),
+						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				default:
+					var select = msg.a;
+					var $temp$msg = $author$project$Main$InputAreaUpdate(
+						$author$project$Example$getExampleString(select)),
+						$temp$model = model;
+					msg = $temp$msg;
+					model = $temp$model;
+					continue update;
+			}
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
@@ -6482,9 +6505,81 @@ var $author$project$Main$viewDebugStates = function (model) {
 					]))
 			]));
 };
-var $author$project$Main$InputAreaUpdate = function (a) {
-	return {$: 'InputAreaUpdate', a: a};
+var $author$project$Main$ExampleSelectChange = function (a) {
+	return {$: 'ExampleSelectChange', a: a};
 };
+var $author$project$Example$examples = _List_fromArray(
+	[
+		_Utils_Tuple2('', '-'),
+		_Utils_Tuple2('simple', 'Simple Hello World')
+	]);
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $author$project$Main$onChange = function (handler) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, handler, $elm$html$Html$Events$targetValue));
+};
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewExampleSelect = function () {
+	var handler = function (selected) {
+		return $author$project$Main$ExampleSelectChange(selected);
+	};
+	return A2(
+		$elm$html$Html$select,
+		_List_fromArray(
+			[
+				$author$project$Main$onChange(handler)
+			]),
+		A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var v = _v0.a;
+				var t = _v0.b;
+				return A2(
+					$elm$html$Html$option,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$value(v)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(t)
+						]));
+			},
+			$author$project$Example$examples));
+}();
 var $author$project$Main$inputAreaStyles = _List_fromArray(
 	[
 		A2($elm$html$Html$Attributes$style, 'width', '600px'),
@@ -6498,7 +6593,6 @@ var $elm$html$Html$Events$alwaysStop = function (x) {
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -6506,17 +6600,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
 var $elm$html$Html$Events$onInput = function (tagger) {
 	return A2(
 		$elm$html$Html$Events$stopPropagationOn,
@@ -6527,28 +6610,31 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $author$project$Main$viewInputArea = A2(
-	$elm$html$Html$div,
-	_List_Nil,
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Input:')
-				])),
-			A2(
-			$elm$html$Html$textarea,
-			_Utils_ap(
-				$author$project$Main$inputAreaStyles,
+var $author$project$Main$viewInputArea = function (input) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onInput($author$project$Main$InputAreaUpdate)
+						$elm$html$Html$text('Input:')
 					])),
-			_List_Nil)
-		]));
+				A2(
+				$elm$html$Html$textarea,
+				_Utils_ap(
+					$author$project$Main$inputAreaStyles,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onInput($author$project$Main$InputAreaUpdate),
+							$elm$html$Html$Attributes$value(input)
+						])),
+				_List_Nil)
+			]));
+};
 var $author$project$Main$viewOutputArea = function (output) {
 	return A2(
 		$elm$html$Html$div,
@@ -6626,16 +6712,6 @@ var $author$project$Main$viewShowArea = F2(
 var $author$project$Main$Start = {$: 'Start'};
 var $author$project$Main$StepNext = {$: 'StepNext'};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
 var $elm$html$Html$Events$onClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
@@ -6788,6 +6864,7 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
+				$author$project$Main$viewExampleSelect,
 				A3(
 				$author$project$Main$viewStatus,
 				function ($) {
@@ -6799,7 +6876,10 @@ var $author$project$Main$view = function (model) {
 				function ($) {
 					return $.status;
 				}(model)),
-				$author$project$Main$viewInputArea,
+				$author$project$Main$viewInputArea(
+				function ($) {
+					return $.inputAreaText;
+				}(model)),
 				$author$project$Main$viewOutputArea(
 				function ($) {
 					return $.output;
