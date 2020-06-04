@@ -549,7 +549,7 @@ viewShowArea input current =
 
 inputAreaStyles : List (Html.Attribute Msg)
 inputAreaStyles =
-    [ style "width" "600px"
+    [ style "width" "100%"
     , style "height" "200px"
     , style "font-size" "20px"
     , style "font-family" "\"Courier New\", monospace"
