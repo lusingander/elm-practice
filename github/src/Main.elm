@@ -1,7 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, span, text)
+import Html exposing (Html, button, div, span, text)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Http
 import Json.Decode
 import Json.Decode.Pipeline
@@ -76,6 +78,7 @@ repositoryDecoder =
 
 type Msg
     = GotRepositories (Result Http.Error Repositories)
+    | ClickReloadButton
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +98,16 @@ update msg model =
             , Cmd.none
             )
 
+        ClickReloadButton ->
+            ( { model
+                | status = Loading
+              }
+            , Http.get
+                { url = repositoriesUrl
+                , expect = Http.expectJson GotRepositories repositoriesDecoder
+                }
+            )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -103,6 +116,30 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
+    div
+        [ style "margin" "20px"
+        ]
+        [ viewHeader
+        , viewContent model
+        ]
+
+
+viewHeader : Html Msg
+viewHeader =
+    div
+        [ style "margin" "10px"
+        ]
+        [ text "Recently updated Elm repositories on GitHub"
+        , button
+            [ onClick ClickReloadButton
+            ]
+            [ text "Reload"
+            ]
+        ]
+
+
+viewContent : Model -> Html Msg
+viewContent model =
     case .status model of
         Loading ->
             div
@@ -123,7 +160,8 @@ view model =
 viewRepository : Repository -> Html Msg
 viewRepository repo =
     div
-        []
+        [ style "margin" "5px"
+        ]
         [ span [] [ text (.updated repo) ]
         , span [] [ text (.name repo) ]
         , span [] [ text (.url repo) ]
