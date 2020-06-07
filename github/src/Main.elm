@@ -66,6 +66,11 @@ repositoriesDecoder =
 type alias Repository =
     { name : String
     , url : String
+    , description : Maybe String
+    , stars : Int
+    , watchers : Int
+    , forks : Int
+    , created : Time.Posix
     , updated : Time.Posix
     }
 
@@ -75,6 +80,11 @@ repositoryDecoder =
     Json.Decode.succeed Repository
         |> Json.Decode.Pipeline.required "full_name" Json.Decode.string
         |> Json.Decode.Pipeline.required "html_url" Json.Decode.string
+        |> Json.Decode.Pipeline.required "description" (Json.Decode.nullable Json.Decode.string)
+        |> Json.Decode.Pipeline.required "stargazers_count" Json.Decode.int
+        |> Json.Decode.Pipeline.required "watchers_count" Json.Decode.int
+        |> Json.Decode.Pipeline.required "forks_count" Json.Decode.int
+        |> Json.Decode.Pipeline.required "created_at" Json.Decode.Extra.datetime
         |> Json.Decode.Pipeline.required "updated_at" Json.Decode.Extra.datetime
 
 
