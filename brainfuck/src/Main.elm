@@ -5,8 +5,8 @@ import Array.Extra
 import Browser
 import Dict
 import Example
-import Html exposing (Html, button, code, div, option, pre, select, span, text, textarea)
-import Html.Attributes exposing (style, value)
+import Html exposing (Html, button, code, div, input, option, pre, select, span, text, textarea)
+import Html.Attributes exposing (style, type_, value)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode
 import List.Extra
@@ -33,6 +33,7 @@ type alias Model =
     , output : String
     , jumpInfo : JumpInfo
     , status : ExecutionStatus
+    , playSpeed : Float
     }
 
 
@@ -83,6 +84,7 @@ initModel =
     , output = ""
     , jumpInfo = []
     , status = Default
+    , playSpeed = initPlaySpeed
     }
 
 
@@ -99,6 +101,11 @@ initPointer =
 initCurrentStep : Int
 initCurrentStep =
     0
+
+
+initPlaySpeed : Float
+initPlaySpeed =
+    100
 
 
 buildJumpInfo : String -> JumpInfo
@@ -351,6 +358,7 @@ type Msg
     | Play
     | Pause
     | ExampleSelectChange String
+    | UpdateSpeedSlider String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -416,11 +424,25 @@ update msg model =
         ExampleSelectChange select ->
             update (InputAreaUpdate <| Example.getExampleString select) model
 
+        UpdateSpeedSlider speed ->
+            case String.toFloat speed of
+                Just s ->
+                    ( { model
+                        | playSpeed = s
+                      }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( model
+                    , Cmd.none
+                    )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     if .status model == AutoPlaying then
-        Time.every 100 (\_ -> Tick)
+        Time.every (.playSpeed model) (\_ -> Tick)
 
     else
         Sub.none
@@ -431,7 +453,7 @@ view model =
     div
         [ style "margin" "30px" ]
         [ viewExampleSelect
-        , viewStatus (.memory model) (.pointer model) (.status model)
+        , viewStatus (.memory model) (.pointer model) (.status model) (.playSpeed model)
         , viewInputArea (.inputAreaText model)
         , viewOutputArea (.output model)
         , viewShowArea (.source model) (.currentStep model)
@@ -459,14 +481,15 @@ viewExampleSelect =
         )
 
 
-viewStatus : Memory -> Pointer -> ExecutionStatus -> Html Msg
-viewStatus memory pointer status =
+viewStatus : Memory -> Pointer -> ExecutionStatus -> Float -> Html Msg
+viewStatus memory pointer status speed =
     div []
         [ viewMemory memory pointer
         , div [] [ text <| "pointer: " ++ fromInt pointer ]
         , button [ onClick Start ] [ text "Start" ]
         , button [ onClick StepNext ] [ text "Next" ]
         , viewPlayButton status
+        , viewPlaySpeedSlider speed
         ]
 
 
@@ -477,6 +500,23 @@ viewPlayButton status =
 
     else
         button [ onClick Play ] [ text "Play" ]
+
+
+viewPlaySpeedSlider : Float -> Html Msg
+viewPlaySpeedSlider speed =
+    span
+        []
+        [ text "Speed: "
+        , input
+            [ type_ "range"
+            , Html.Attributes.min "50"
+            , Html.Attributes.max "500"
+            , Html.Attributes.step "10"
+            , value <| String.fromFloat speed
+            , onInput UpdateSpeedSlider
+            ]
+            []
+        ]
 
 
 viewMemory : Memory -> Pointer -> Html Msg
