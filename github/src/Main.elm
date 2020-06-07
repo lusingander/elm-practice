@@ -54,21 +54,19 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotText result ->
-            case result of
-                Ok fullText ->
-                    ( { model
-                        | status = Success fullText
-                      }
-                    , Cmd.none
-                    )
+        GotText (Ok fullText) ->
+            ( { model
+                | status = Success fullText
+              }
+            , Cmd.none
+            )
 
-                Err _ ->
-                    ( { model
-                        | status = Failure
-                      }
-                    , Cmd.none
-                    )
+        GotText (Err _) ->
+            ( { model
+                | status = Failure
+              }
+            , Cmd.none
+            )
 
 
 subscriptions : Model -> Sub Msg
