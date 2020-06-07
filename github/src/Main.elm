@@ -209,6 +209,7 @@ viewHeader =
         [ Html.text "Recently updated Elm repositories on GitHub"
         , Html.button
             [ onClick ClickReloadButton
+            , style "margin" "0 10px"
             ]
             [ Html.text "Reload"
             ]
