@@ -316,7 +316,7 @@ indexIsValidChar current =
 
 isValidChar : String -> Bool
 isValidChar str =
-    List.member str [ ">", "<", "+", "-", ".", ",", "[", "]" ]
+    stringToCommand str /= Nothing
 
 
 stringToCommand : String -> Maybe Command
