@@ -6,7 +6,9 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode
+import Json.Decode.Extra
 import Json.Decode.Pipeline
+import Time
 
 
 main : Program () Model Msg
@@ -62,9 +64,9 @@ repositoriesDecoder =
 
 
 type alias Repository =
-    { name : String -- full_name
-    , url : String -- html_url
-    , updated : String -- updated_at
+    { name : String
+    , url : String
+    , updated : Time.Posix
     }
 
 
@@ -73,7 +75,82 @@ repositoryDecoder =
     Json.Decode.succeed Repository
         |> Json.Decode.Pipeline.required "full_name" Json.Decode.string
         |> Json.Decode.Pipeline.required "html_url" Json.Decode.string
-        |> Json.Decode.Pipeline.required "updated_at" Json.Decode.string
+        |> Json.Decode.Pipeline.required "updated_at" Json.Decode.Extra.datetime
+
+
+formatTime : Time.Posix -> String
+formatTime t =
+    let
+        zone =
+            Time.utc
+
+        year =
+            Time.toYear zone t |> String.fromInt
+
+        month =
+            Time.toMonth zone t |> monthToInt |> String.fromInt |> zeroPad2
+
+        day =
+            Time.toDay zone t |> String.fromInt |> zeroPad2
+
+        hour =
+            Time.toHour zone t |> String.fromInt |> zeroPad2
+
+        minute =
+            Time.toMinute zone t |> String.fromInt |> zeroPad2
+
+        second =
+            Time.toSecond zone t |> String.fromInt |> zeroPad2
+    in
+    String.join " "
+        [ String.join "/" [ year, month, day ]
+        , String.join ":" [ hour, minute, second ]
+        ]
+
+
+zeroPad2 : String -> String
+zeroPad2 =
+    String.padLeft 2 '0'
+
+
+monthToInt : Time.Month -> Int
+monthToInt m =
+    case m of
+        Time.Jan ->
+            1
+
+        Time.Feb ->
+            2
+
+        Time.Mar ->
+            3
+
+        Time.Apr ->
+            4
+
+        Time.May ->
+            5
+
+        Time.Jun ->
+            6
+
+        Time.Jul ->
+            7
+
+        Time.Aug ->
+            8
+
+        Time.Sep ->
+            9
+
+        Time.Oct ->
+            10
+
+        Time.Nov ->
+            11
+
+        Time.Dec ->
+            12
 
 
 type Msg
@@ -162,7 +239,7 @@ viewRepository repo =
     div
         [ style "margin" "5px"
         ]
-        [ span [] [ text (.updated repo) ]
+        [ span [] [ text <| formatTime <| .updated repo ]
         , span [] [ text (.name repo) ]
         , span [] [ text (.url repo) ]
         ]
