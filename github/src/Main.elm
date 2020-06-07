@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, span, text)
-import Html.Attributes exposing (style)
+import Html exposing (Html)
+import Html.Attributes exposing (href, rel, style, target)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode
@@ -193,7 +193,7 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    div
+    Html.div
         [ style "margin" "20px"
         ]
         [ viewHeader
@@ -203,14 +203,14 @@ view model =
 
 viewHeader : Html Msg
 viewHeader =
-    div
+    Html.div
         [ style "margin" "10px"
         ]
-        [ text "Recently updated Elm repositories on GitHub"
-        , button
+        [ Html.text "Recently updated Elm repositories on GitHub"
+        , Html.button
             [ onClick ClickReloadButton
             ]
-            [ text "Reload"
+            [ Html.text "Reload"
             ]
         ]
 
@@ -219,27 +219,32 @@ viewContent : Model -> Html Msg
 viewContent model =
     case .status model of
         Loading ->
-            div
+            Html.div
                 []
-                [ text "Loading..." ]
+                [ Html.text "Loading..." ]
 
         Failure ->
-            div
+            Html.div
                 []
-                [ text "Failed to load" ]
+                [ Html.text "Failed to load" ]
 
         Success repos ->
-            div
+            Html.div
                 []
                 (List.map viewRepository repos)
 
 
 viewRepository : Repository -> Html Msg
 viewRepository repo =
-    div
+    Html.div
         [ style "margin" "5px"
         ]
-        [ span [] [ text <| formatTime <| .updated repo ]
-        , span [] [ text (.name repo) ]
-        , span [] [ text (.url repo) ]
+        [ Html.span [] [ Html.text <| formatTime <| .updated repo ]
+        , Html.span [] [ Html.text (.name repo) ]
+        , Html.a
+            [ href (.url repo)
+            , target "_blank"
+            , rel "noopener noreferrer"
+            ]
+            [ Html.text (.url repo) ]
         ]
