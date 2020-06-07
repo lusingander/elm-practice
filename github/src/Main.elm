@@ -245,17 +245,12 @@ viewRepository repo =
             ]
             [ Html.text <| formatTime <| .updated repo
             ]
-        , Html.span
-            [ style "margin" "0 5px"
-            ]
-            [ Html.text (.name repo)
-            ]
         , Html.a
             [ href (.url repo)
             , target "_blank"
             , rel "noopener noreferrer"
             , style "margin" "0 5px"
             ]
-            [ Html.text (.url repo)
+            [ Html.text (.name repo)
             ]
         ]
