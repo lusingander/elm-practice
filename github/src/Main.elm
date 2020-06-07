@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, span, text)
-import Html.Attributes exposing (required)
 import Http
 import Json.Decode
 import Json.Decode.Pipeline
