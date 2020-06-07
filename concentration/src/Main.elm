@@ -238,12 +238,16 @@ update msg model =
             )
 
         MouseEnter cardState ->
-            ( { model | cardStates = mouseEnterToCard cardState <| .cardStates model }
+            ( { model
+                | cardStates = mouseEnterToCard cardState <| .cardStates model
+              }
             , Cmd.none
             )
 
         MouseLeave cardState ->
-            ( { model | cardStates = mouseLeaveFromCard cardState <| .cardStates model }
+            ( { model
+                | cardStates = mouseLeaveFromCard cardState <| .cardStates model
+              }
             , Cmd.none
             )
 
