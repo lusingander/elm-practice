@@ -1,8 +1,11 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div, text)
+import Html exposing (Html, div, span, text)
+import Html.Attributes exposing (required)
 import Http
+import Json.Decode
+import Json.Decode.Pipeline
 
 
 main : Program () Model Msg
@@ -25,7 +28,7 @@ init _ =
     ( initModel
     , Http.get
         { url = repositoriesUrl
-        , expect = Http.expectString GotText
+        , expect = Http.expectJson GotRepositories repositoriesDecoder
         }
     )
 
@@ -44,24 +47,49 @@ initModel =
 type Status
     = Loading
     | Failure
-    | Success String
+    | Success Repositories
+
+
+type alias Repositories =
+    List Repository
+
+
+repositoriesDecoder : Json.Decode.Decoder Repositories
+repositoriesDecoder =
+    Json.Decode.field "items" <|
+        Json.Decode.list repositoryDecoder
+
+
+type alias Repository =
+    { name : String -- full_name
+    , url : String -- html_url
+    , updated : String -- updated_at
+    }
+
+
+repositoryDecoder : Json.Decode.Decoder Repository
+repositoryDecoder =
+    Json.Decode.succeed Repository
+        |> Json.Decode.Pipeline.required "full_name" Json.Decode.string
+        |> Json.Decode.Pipeline.required "html_url" Json.Decode.string
+        |> Json.Decode.Pipeline.required "updated_at" Json.Decode.string
 
 
 type Msg
-    = GotText (Result Http.Error String)
+    = GotRepositories (Result Http.Error Repositories)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotText (Ok fullText) ->
+        GotRepositories (Ok repositories) ->
             ( { model
-                | status = Success fullText
+                | status = Success repositories
               }
             , Cmd.none
             )
 
-        GotText (Err _) ->
+        GotRepositories (Err _) ->
             ( { model
                 | status = Failure
               }
@@ -87,7 +115,17 @@ view model =
                 []
                 [ text "Failed to load" ]
 
-        Success t ->
+        Success repos ->
             div
                 []
-                [ text t ]
+                (List.map viewRepository repos)
+
+
+viewRepository : Repository -> Html Msg
+viewRepository repo =
+    div
+        []
+        [ span [] [ text (.updated repo) ]
+        , span [] [ text (.name repo) ]
+        , span [] [ text (.url repo) ]
+        ]
