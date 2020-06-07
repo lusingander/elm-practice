@@ -221,6 +221,11 @@ step model =
             model
 
 
+nowPlaying : Model -> Bool
+nowPlaying model =
+    .status model == AutoPlaying
+
+
 incrementCurrentStep : Model -> Model
 incrementCurrentStep model =
     let
@@ -385,7 +390,7 @@ update msg model =
             )
 
         Tick ->
-            if .status model == AutoPlaying then
+            if nowPlaying model then
                 ( step model
                 , Cmd.none
                 )
@@ -409,7 +414,7 @@ update msg model =
                 )
 
         Pause ->
-            if .status model == AutoPlaying then
+            if nowPlaying model then
                 ( { model
                     | status = Executing
                   }
@@ -441,7 +446,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    if .status model == AutoPlaying then
+    if nowPlaying model then
         Time.every (.playSpeed model) (\_ -> Tick)
 
     else
@@ -488,14 +493,14 @@ viewStatus model =
         , div [] [ text <| "pointer: " ++ fromInt (.pointer model) ]
         , button [ onClick Start ] [ text "Start" ]
         , button [ onClick StepNext ] [ text "Next" ]
-        , viewPlayButton (.status model)
+        , viewPlayButton model
         , viewPlaySpeedSlider (.playSpeed model)
         ]
 
 
-viewPlayButton : ExecutionStatus -> Html Msg
-viewPlayButton status =
-    if status == AutoPlaying then
+viewPlayButton : Model -> Html Msg
+viewPlayButton model =
+    if nowPlaying model then
         button [ onClick Pause ] [ text "Pause" ]
 
     else
