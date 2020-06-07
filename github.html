@@ -6294,9 +6294,9 @@ var $author$project$Main$Loading = {$: 'Loading'};
 var $author$project$Main$initModel = {status: $author$project$Main$Loading};
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$list = _Json_decodeList;
-var $author$project$Main$Repository = F3(
-	function (name, url, updated) {
-		return {name: name, updated: updated, url: url};
+var $author$project$Main$Repository = F8(
+	function (name, url, description, stars, watchers, forks, created, updated) {
+		return {created: created, description: description, forks: forks, name: name, stars: stars, updated: updated, url: url, watchers: watchers};
 	});
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$fail = _Json_fail;
@@ -7080,6 +7080,17 @@ var $elm_community$json_extra$Json$Decode$Extra$datetime = A2(
 		}
 	},
 	$elm$json$Json$Decode$string);
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$nullable = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder)
+			]));
+};
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 	function (key, valDecoder, decoder) {
@@ -7094,13 +7105,33 @@ var $author$project$Main$repositoryDecoder = A3(
 	$elm_community$json_extra$Json$Decode$Extra$datetime,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'html_url',
-		$elm$json$Json$Decode$string,
+		'created_at',
+		$elm_community$json_extra$Json$Decode$Extra$datetime,
 		A3(
 			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'full_name',
-			$elm$json$Json$Decode$string,
-			$elm$json$Json$Decode$succeed($author$project$Main$Repository))));
+			'forks_count',
+			$elm$json$Json$Decode$int,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'watchers_count',
+				$elm$json$Json$Decode$int,
+				A3(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+					'stargazers_count',
+					$elm$json$Json$Decode$int,
+					A3(
+						$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+						'description',
+						$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string),
+						A3(
+							$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+							'html_url',
+							$elm$json$Json$Decode$string,
+							A3(
+								$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+								'full_name',
+								$elm$json$Json$Decode$string,
+								$elm$json$Json$Decode$succeed($author$project$Main$Repository)))))))));
 var $author$project$Main$repositoriesDecoder = A2(
 	$elm$json$Json$Decode$field,
 	'items',
