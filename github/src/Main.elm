@@ -1,11 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div)
-
-
-
--- https://api.github.com/search/repositories?q=language:elm&sort=updated&order=desc
+import Html exposing (Html, div, text)
+import Http
 
 
 main : Program () Model Msg
@@ -18,42 +15,81 @@ main =
         }
 
 
-init : () -> ( Model, Cmd msg )
+repositoriesUrl : String
+repositoriesUrl =
+    "https://api.github.com/search/repositories?q=language:elm&sort=updated&order=desc"
+
+
+init : () -> ( Model, Cmd Msg )
 init _ =
     ( initModel
-    , Cmd.none
+    , Http.get
+        { url = repositoriesUrl
+        , expect = Http.expectString GotText
+        }
     )
 
 
 type alias Model =
-    Int
+    { status : Status
+    }
 
 
 initModel : Model
 initModel =
-    0
+    { status = Loading
+    }
+
+
+type Status
+    = Loading
+    | Failure
+    | Success String
 
 
 type Msg
-    = Default
+    = GotText (Result Http.Error String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Default ->
-            ( model
-            , Cmd.none
-            )
+        GotText result ->
+            case result of
+                Ok fullText ->
+                    ( { model
+                        | status = Success fullText
+                      }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model
+                        | status = Failure
+                      }
+                    , Cmd.none
+                    )
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
 view : Model -> Html Msg
 view model =
-    div
-        []
-        []
+    case .status model of
+        Loading ->
+            div
+                []
+                [ text "Loading..." ]
+
+        Failure ->
+            div
+                []
+                [ text "Failed to load" ]
+
+        Success t ->
+            div
+                []
+                [ text t ]
