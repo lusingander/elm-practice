@@ -453,7 +453,7 @@ view model =
     div
         [ style "margin" "30px" ]
         [ viewExampleSelect
-        , viewStatus (.memory model) (.pointer model) (.status model) (.playSpeed model)
+        , viewStatus model
         , viewInputArea (.inputAreaText model)
         , viewOutputArea (.output model)
         , viewShowArea (.source model) (.currentStep model)
@@ -481,15 +481,15 @@ viewExampleSelect =
         )
 
 
-viewStatus : Memory -> Pointer -> ExecutionStatus -> Float -> Html Msg
-viewStatus memory pointer status speed =
+viewStatus : Model -> Html Msg
+viewStatus model =
     div []
-        [ viewMemory memory pointer
-        , div [] [ text <| "pointer: " ++ fromInt pointer ]
+        [ viewMemory (.memory model) (.pointer model)
+        , div [] [ text <| "pointer: " ++ fromInt (.pointer model) ]
         , button [ onClick Start ] [ text "Start" ]
         , button [ onClick StepNext ] [ text "Next" ]
-        , viewPlayButton status
-        , viewPlaySpeedSlider speed
+        , viewPlayButton (.status model)
+        , viewPlaySpeedSlider (.playSpeed model)
         ]
 
 
