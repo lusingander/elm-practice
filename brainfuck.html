@@ -6388,6 +6388,15 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						$author$project$Main$start(model),
 						$elm$core$Platform$Cmd$none);
+				case 'Edit':
+					var $temp$msg = $author$project$Main$InputAreaUpdate(
+						function ($) {
+							return $.inputAreaText;
+						}(model)),
+						$temp$model = model;
+					msg = $temp$msg;
+					model = $temp$model;
+					continue update;
 				case 'StepNext':
 					return _Utils_Tuple2(
 						$author$project$Main$step(model),
@@ -6443,62 +6452,16 @@ var $author$project$Main$update = F2(
 			}
 		}
 	});
+var $author$project$Main$executing = function (model) {
+	return !_Utils_eq(
+		function ($) {
+			return $.status;
+		}(model),
+		$author$project$Main$Default);
+};
+var $author$project$Main$Start = {$: 'Start'};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$executionStatusToString = function (status) {
-	switch (status.$) {
-		case 'Default':
-			return 'Default';
-		case 'Executing':
-			return 'Executing';
-		case 'AutoPlaying':
-			return 'AutoPlaying';
-		default:
-			return 'End';
-	}
-};
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$viewDebugStates = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Current Step: ' + $elm$core$String$fromInt(
-							function ($) {
-								return $.currentStep;
-							}(model)))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						'Current State: ' + $author$project$Main$executionStatusToString(
-							function ($) {
-								return $.status;
-							}(model)))
-					]))
-			]));
-};
-var $author$project$Main$ExampleSelectChange = function (a) {
-	return {$: 'ExampleSelectChange', a: a};
-};
-var $author$project$Example$examples = _List_fromArray(
-	[
-		_Utils_Tuple2('', '-'),
-		_Utils_Tuple2('simple', 'Simple Hello World'),
-		_Utils_Tuple2('formatted', 'Formatted Hello World')
-	]);
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6510,6 +6473,25 @@ var $elm$html$Html$Events$on = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$ExampleSelectChange = function (a) {
+	return {$: 'ExampleSelectChange', a: a};
+};
+var $author$project$Example$examples = _List_fromArray(
+	[
+		_Utils_Tuple2('', '-'),
+		_Utils_Tuple2('simple', 'Simple Hello World'),
+		_Utils_Tuple2('formatted', 'Formatted Hello World')
+	]);
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
@@ -6621,6 +6603,74 @@ var $author$project$Main$viewInputArea = function (input) {
 				_List_Nil)
 			]));
 };
+var $author$project$Main$viewDefault = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '30px')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$Start)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Start')
+					])),
+				$author$project$Main$viewInputArea(
+				function ($) {
+					return $.inputAreaText;
+				}(model)),
+				$author$project$Main$viewExampleSelect
+			]));
+};
+var $author$project$Main$executionStatusToString = function (status) {
+	switch (status.$) {
+		case 'Default':
+			return 'Default';
+		case 'Executing':
+			return 'Executing';
+		case 'AutoPlaying':
+			return 'AutoPlaying';
+		default:
+			return 'End';
+	}
+};
+var $author$project$Main$viewDebugStates = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Current Step: ' + $elm$core$String$fromInt(
+							function ($) {
+								return $.currentStep;
+							}(model)))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'Current State: ' + $author$project$Main$executionStatusToString(
+							function ($) {
+								return $.status;
+							}(model)))
+					]))
+			]));
+};
 var $author$project$Main$viewOutputArea = function (output) {
 	return A2(
 		$elm$html$Html$div,
@@ -6695,15 +6745,8 @@ var $author$project$Main$viewShowArea = F2(
 						]))
 				]));
 	});
-var $author$project$Main$Start = {$: 'Start'};
+var $author$project$Main$Edit = {$: 'Edit'};
 var $author$project$Main$StepNext = {$: 'StepNext'};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
 var $elm$core$Array$indexedMap = F2(
@@ -6765,7 +6808,7 @@ var $author$project$Main$viewSingleMemory = F2(
 var $author$project$Main$viewMemory = F2(
 	function (memory, pointer) {
 		return A2(
-			$elm$html$Html$span,
+			$elm$html$Html$div,
 			_List_Nil,
 			$elm$core$Array$toList(
 				A2(
@@ -6844,6 +6887,31 @@ var $author$project$Main$viewStatus = function (model) {
 		_List_fromArray(
 			[
 				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$Edit)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Edit')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$StepNext)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Next')
+					])),
+				$author$project$Main$viewPlayButton(model),
+				$author$project$Main$viewPlaySpeedSlider(
+				function ($) {
+					return $.playSpeed;
+				}(model)),
+				A2(
 				$author$project$Main$viewMemory,
 				function ($) {
 					return $.memory;
@@ -6861,35 +6929,10 @@ var $author$project$Main$viewStatus = function (model) {
 							function ($) {
 								return $.pointer;
 							}(model)))
-					])),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Main$Start)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Start')
-					])),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Main$StepNext)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Next')
-					])),
-				$author$project$Main$viewPlayButton(model),
-				$author$project$Main$viewPlaySpeedSlider(
-				function ($) {
-					return $.playSpeed;
-				}(model))
+					]))
 			]));
 };
-var $author$project$Main$view = function (model) {
+var $author$project$Main$viewExecuting = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -6898,12 +6941,7 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$viewExampleSelect,
 				$author$project$Main$viewStatus(model),
-				$author$project$Main$viewInputArea(
-				function ($) {
-					return $.inputAreaText;
-				}(model)),
 				$author$project$Main$viewOutputArea(
 				function ($) {
 					return $.output;
@@ -6918,6 +6956,9 @@ var $author$project$Main$view = function (model) {
 				}(model)),
 				$author$project$Main$viewDebugStates(model)
 			]));
+};
+var $author$project$Main$view = function (model) {
+	return $author$project$Main$executing(model) ? $author$project$Main$viewExecuting(model) : $author$project$Main$viewDefault(model);
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
