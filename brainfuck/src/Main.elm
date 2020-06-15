@@ -514,13 +514,14 @@ viewPlaySpeedSlider speed =
         [ text "Speed: "
         , input
             [ type_ "range"
-            , Html.Attributes.min "50"
+            , Html.Attributes.min "10"
             , Html.Attributes.max "500"
             , Html.Attributes.step "10"
             , value <| String.fromFloat speed
             , onInput UpdateSpeedSlider
             ]
             []
+        , text <| "(" ++ String.fromFloat speed ++ "ms/step)"
         ]
 
 
