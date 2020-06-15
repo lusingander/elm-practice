@@ -226,6 +226,11 @@ nowPlaying model =
     .status model == AutoPlaying
 
 
+executing : Model -> Bool
+executing model =
+    .status model /= Default
+
+
 incrementCurrentStep : Model -> Model
 incrementCurrentStep model =
     let
@@ -357,6 +362,7 @@ stringToCommand s =
 
 type Msg
     = Start
+    | Edit
     | StepNext
     | InputAreaUpdate String
     | Tick
@@ -373,6 +379,9 @@ update msg model =
             ( start model
             , Cmd.none
             )
+
+        Edit ->
+            update (InputAreaUpdate <| .inputAreaText model) model
 
         StepNext ->
             ( step model
@@ -455,11 +464,28 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
+    if executing model then
+        viewExecuting model
+
+    else
+        viewDefault model
+
+
+viewDefault : Model -> Html Msg
+viewDefault model =
     div
         [ style "margin" "30px" ]
-        [ viewExampleSelect
-        , viewStatus model
+        [ button [ onClick Start ] [ text "Start" ]
         , viewInputArea (.inputAreaText model)
+        , viewExampleSelect
+        ]
+
+
+viewExecuting : Model -> Html Msg
+viewExecuting model =
+    div
+        [ style "margin" "30px" ]
+        [ viewStatus model
         , viewOutputArea (.output model)
         , viewShowArea (.source model) (.currentStep model)
         , viewDebugStates model
@@ -489,12 +515,12 @@ viewExampleSelect =
 viewStatus : Model -> Html Msg
 viewStatus model =
     div []
-        [ viewMemory (.memory model) (.pointer model)
-        , div [] [ text <| "pointer: " ++ fromInt (.pointer model) ]
-        , button [ onClick Start ] [ text "Start" ]
+        [ button [ onClick Edit ] [ text "Edit" ]
         , button [ onClick StepNext ] [ text "Next" ]
         , viewPlayButton model
         , viewPlaySpeedSlider (.playSpeed model)
+        , viewMemory (.memory model) (.pointer model)
+        , div [] [ text <| "pointer: " ++ fromInt (.pointer model) ]
         ]
 
 
@@ -527,7 +553,7 @@ viewPlaySpeedSlider speed =
 
 viewMemory : Memory -> Pointer -> Html Msg
 viewMemory memory pointer =
-    span [] <|
+    div [] <|
         Array.toList <|
             Array.indexedMap (\i m -> viewSingleMemory (i == pointer) m) memory
 
