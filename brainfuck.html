@@ -6825,14 +6825,16 @@ var $author$project$Main$viewPlaySpeedSlider = function (speed) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('range'),
-						$elm$html$Html$Attributes$min('50'),
+						$elm$html$Html$Attributes$min('10'),
 						$elm$html$Html$Attributes$max('500'),
 						$elm$html$Html$Attributes$step('10'),
 						$elm$html$Html$Attributes$value(
 						$elm$core$String$fromFloat(speed)),
 						$elm$html$Html$Events$onInput($author$project$Main$UpdateSpeedSlider)
 					]),
-				_List_Nil)
+				_List_Nil),
+				$elm$html$Html$text(
+				'(' + ($elm$core$String$fromFloat(speed) + 'ms/step)'))
 			]));
 };
 var $author$project$Main$viewStatus = function (model) {
