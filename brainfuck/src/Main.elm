@@ -611,6 +611,7 @@ viewShowArea input current =
                 [ span [] [ text prevString ]
                 , span
                     [ style "color" "red"
+                    , style "font-weight" "bold"
                     ]
                     [ text currentChar ]
                 , span [] [ text forwardString ]
