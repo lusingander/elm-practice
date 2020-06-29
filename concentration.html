@@ -5262,10 +5262,14 @@ var $author$project$Card$Card = F2(
 	function (a, b) {
 		return {$: 'Card', a: a, b: b};
 	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
+var $elm_community$maybe_extra$Maybe$Extra$cons = F2(
+	function (item, list) {
+		if (item.$ === 'Just') {
+			var v = item.a;
+			return A2($elm$core$List$cons, v, list);
+		} else {
+			return list;
+		}
 	});
 var $author$project$Card$Ace = {$: 'Ace'};
 var $author$project$Card$Eight = {$: 'Eight'};
@@ -5283,41 +5287,47 @@ var $author$project$Card$Two = {$: 'Two'};
 var $author$project$Card$numberToRank = function (n) {
 	switch (n) {
 		case 1:
-			return $author$project$Card$Ace;
+			return $elm$core$Maybe$Just($author$project$Card$Ace);
 		case 2:
-			return $author$project$Card$Two;
+			return $elm$core$Maybe$Just($author$project$Card$Two);
 		case 3:
-			return $author$project$Card$Three;
+			return $elm$core$Maybe$Just($author$project$Card$Three);
 		case 4:
-			return $author$project$Card$Four;
+			return $elm$core$Maybe$Just($author$project$Card$Four);
 		case 5:
-			return $author$project$Card$Five;
+			return $elm$core$Maybe$Just($author$project$Card$Five);
 		case 6:
-			return $author$project$Card$Six;
+			return $elm$core$Maybe$Just($author$project$Card$Six);
 		case 7:
-			return $author$project$Card$Seven;
+			return $elm$core$Maybe$Just($author$project$Card$Seven);
 		case 8:
-			return $author$project$Card$Eight;
+			return $elm$core$Maybe$Just($author$project$Card$Eight);
 		case 9:
-			return $author$project$Card$Nine;
+			return $elm$core$Maybe$Just($author$project$Card$Nine);
 		case 10:
-			return $author$project$Card$Ten;
+			return $elm$core$Maybe$Just($author$project$Card$Ten);
 		case 11:
-			return $author$project$Card$Jack;
+			return $elm$core$Maybe$Just($author$project$Card$Jack);
 		case 12:
-			return $author$project$Card$Queen;
+			return $elm$core$Maybe$Just($author$project$Card$Queen);
+		case 13:
+			return $elm$core$Maybe$Just($author$project$Card$King);
 		default:
-			return $author$project$Card$King;
+			return $elm$core$Maybe$Nothing;
 	}
 };
 var $author$project$Card$suitCards = function (s) {
 	return A2(
 		$elm$core$List$map,
-		A2(
-			$elm$core$Basics$composeR,
-			$author$project$Card$numberToRank,
-			$author$project$Card$Card(s)),
-		A2($elm$core$List$range, 1, 13));
+		$author$project$Card$Card(s),
+		A3(
+			$elm$core$List$foldr,
+			$elm_community$maybe_extra$Maybe$Extra$cons,
+			_List_Nil,
+			A2(
+				$elm$core$List$map,
+				$author$project$Card$numberToRank,
+				A2($elm$core$List$range, 1, 13))));
 };
 var $author$project$Card$allCards = $elm$core$List$concat(
 	_List_fromArray(
