@@ -1,5 +1,7 @@
 module Card exposing (Card, allCards, numberEquals, showCard, showCardBack)
 
+import Maybe.Extra exposing (cons)
+
 
 type Card
     = Card Suit Rank
@@ -29,47 +31,50 @@ type Rank
     | King
 
 
-numberToRank : Int -> Rank
+numberToRank : Int -> Maybe Rank
 numberToRank n =
     case n of
         1 ->
-            Ace
+            Just Ace
 
         2 ->
-            Two
+            Just Two
 
         3 ->
-            Three
+            Just Three
 
         4 ->
-            Four
+            Just Four
 
         5 ->
-            Five
+            Just Five
 
         6 ->
-            Six
+            Just Six
 
         7 ->
-            Seven
+            Just Seven
 
         8 ->
-            Eight
+            Just Eight
 
         9 ->
-            Nine
+            Just Nine
 
         10 ->
-            Ten
+            Just Ten
 
         11 ->
-            Jack
+            Just Jack
 
         12 ->
-            Queen
+            Just Queen
+
+        13 ->
+            Just King
 
         _ ->
-            King
+            Nothing
 
 
 rankToNumber : Rank -> Int
@@ -137,7 +142,10 @@ allCards =
 
 suitCards : Suit -> List Card
 suitCards s =
-    List.map (numberToRank >> Card s) <| List.range 1 13
+    List.range 1 13
+        |> List.map numberToRank
+        |> List.foldr cons []
+        |> List.map (Card s)
 
 
 numberEquals : Card -> Card -> Bool
